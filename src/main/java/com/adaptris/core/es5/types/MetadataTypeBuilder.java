@@ -11,6 +11,14 @@ public class MetadataTypeBuilder implements TypeBuilder {
   @NotBlank
   private String key;
 
+  public MetadataTypeBuilder() {
+
+  }
+
+  public MetadataTypeBuilder(String key) {
+    this();
+    setKey(key);
+  }
 
   public String getKey() {
     return key;

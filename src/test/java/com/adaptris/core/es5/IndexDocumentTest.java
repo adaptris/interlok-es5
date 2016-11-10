@@ -3,9 +3,7 @@ package com.adaptris.core.es5;
 import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.ProducerCase;
 import com.adaptris.core.StandaloneProducer;
-import com.adaptris.core.es5.ElasticSearchConnection;
-import com.adaptris.core.es5.IndexDocuments;
-import com.adaptris.core.es5.SimpleDocumentBuilder;
+import com.adaptris.core.es5.types.ConfiguredTypeBuilder;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairSet;
 
@@ -25,15 +23,15 @@ public class IndexDocumentTest extends ProducerCase {
   protected Object retrieveObjectForSampleConfig() {
     KeyValuePairSet settings = new KeyValuePairSet();
     settings.add(new KeyValuePair("cluster.name", "my-cluster"));
-    ElasticSearchConnection esc = new ElasticSearchConnection("myIndex");
+    ElasticSearchConnection esc = new ElasticSearchConnection();
     esc.setSettings(settings);
     esc.addTransportUrl("localhost:9300");
     esc.addTransportUrl("localhost:9301");
     esc.addTransportUrl("localhost:9302");
 
     IndexDocuments producer = new IndexDocuments();
-    producer.setDestination(new ConfiguredProduceDestination("myType"));
-    producer.setDocumentBuilder(new SimpleDocumentBuilder());
+    producer.setDestination(new ConfiguredProduceDestination("myIndex"));
+    producer.setDocumentBuilder(new SimpleDocumentBuilder(new ConfiguredTypeBuilder("myType")));
     return new StandaloneProducer(esc, producer);
   }
 

@@ -1,6 +1,6 @@
 package com.adaptris.core.es5;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 
@@ -11,8 +11,6 @@ import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.es5.DocumentAction;
-import com.adaptris.core.es5.DocumentWrapper;
 import com.adaptris.core.es5.actions.ConfiguredAction;
 import com.adaptris.core.es5.actions.JsonPathAction;
 import com.adaptris.core.es5.actions.MappedAction;
@@ -54,7 +52,7 @@ public class ActionExtractorCase {
       builder.startObject();
       builder.field(FIELD_NAME, val.name());
       builder.endObject();
-      assertEquals(val.name(), action.extract(null, new DocumentWrapper("uid", builder)));
+      assertEquals(val.name(), action.extract(null, new DocumentWrapper("uid", builder, "")));
     }
   }
   

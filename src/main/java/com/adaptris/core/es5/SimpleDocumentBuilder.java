@@ -51,8 +51,13 @@ public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
 
   public SimpleDocumentBuilder() {
     setTypeBuilder(new ConfiguredTypeBuilder());
-
   }
+
+  public SimpleDocumentBuilder(TypeBuilder b) {
+    this();
+    setTypeBuilder(b);
+  }
+
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
     List<DocumentWrapper> result = new ArrayList<>();
