@@ -1,7 +1,8 @@
-package com.adaptris.core.es5;
+package com.adaptris.core.es5.actions;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
+import com.adaptris.core.es5.DocumentWrapper;
 import com.adaptris.util.KeyValuePairList;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

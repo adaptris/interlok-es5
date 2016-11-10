@@ -1,4 +1,4 @@
-package com.adaptris.core.es5;
+package com.adaptris.core.es5.fields;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

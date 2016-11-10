@@ -1,8 +1,10 @@
-package com.adaptris.core.es5;
+package com.adaptris.core.es5.actions;
 
 import javax.validation.constraints.NotNull;
 
 import com.adaptris.core.AdaptrisMessage;
+import com.adaptris.core.es5.DocumentAction;
+import com.adaptris.core.es5.DocumentWrapper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 @XStreamAlias("es5-configured-action")

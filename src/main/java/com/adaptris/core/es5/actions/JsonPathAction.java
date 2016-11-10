@@ -1,4 +1,4 @@
-package com.adaptris.core.es5;
+package com.adaptris.core.es5.actions;
 
 import java.io.IOException;
 
@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.NotBlank;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
+import com.adaptris.core.es5.DocumentWrapper;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
