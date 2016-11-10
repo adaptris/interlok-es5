@@ -60,7 +60,8 @@ public class IndexDocuments extends ElasticSearchProducer {
       final String index = retrieveConnection(ElasticSearchConnection.class).getIndex();
       try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(documentBuilder.build(msg))) {
         docs.forEach(e -> {
-          IndexResponse response = transportClient.prepareIndex(index, type, e.uniqueId()).setSource(e.content()).get();
+          IndexResponse response = transportClient.prepareIndex(index, type, e.uniqueId()).setRouting(e.routing())
+              .setParent(e.parent()).setSource(e.content()).get();
           log.trace("Added document {} version {} to {}", response.getId(), response.getVersion(), index);
         });
       }

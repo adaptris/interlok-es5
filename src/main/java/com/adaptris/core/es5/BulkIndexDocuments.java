@@ -5,6 +5,7 @@ import javax.validation.constraints.Min;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.update.UpdateRequestBuilder;
 
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AdvancedConfig;
@@ -67,13 +68,17 @@ public class BulkIndexDocuments extends IndexDocuments {
           DocumentAction action = DocumentAction.valueOf(getAction().extract(msg, doc));
           switch(action) {
           case INDEX:
-            bulkRequest.add(transportClient.prepareIndex(index, type, doc.uniqueId()).setSource(doc.content()));
+            bulkRequest.add(transportClient.prepareIndex(index, type, doc.uniqueId()).setRouting(doc.routing())
+                .setParent(doc.parent()).setSource(doc.content()));
             break;
           case UPDATE:
-            bulkRequest.add(transportClient.prepareUpdate(index, type, doc.uniqueId()).setDoc(doc.content()));
+            bulkRequest.add(transportClient.prepareUpdate(index, type, doc.uniqueId()).setRouting(doc.routing())
+                .setParent(doc.parent()).setDoc(doc.content()));
+            UpdateRequestBuilder b = transportClient.prepareUpdate(index, type, doc.uniqueId());
             break;
           case DELETE:
-            bulkRequest.add(transportClient.prepareDelete(index, type, doc.uniqueId()));
+            bulkRequest
+                .add(transportClient.prepareDelete(index, type, doc.uniqueId()).setRouting(doc.routing()).setParent(doc.parent()));
             break;
           default:
             throw new ProduceException("Unrecognized action: " + action);
