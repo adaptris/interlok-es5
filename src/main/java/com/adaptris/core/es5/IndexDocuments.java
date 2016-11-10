@@ -21,8 +21,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * Add a document(s) to ElasticSearch.
  * 
  * <p>
- * {@link ProduceDestination#getDestination(AdaptrisMessage)} should return the type of document that we are submitting to into
- * ElasticSearch; the {@code index} is taken from the underlying {@link ElasticSearchConnection}.
+ * {@link ProduceDestination#getDestination(AdaptrisMessage)} should return the index of document that we are submitting to into
+ * ElasticSearch; the {@code type} will be derived from the DocumentWrapper itself.
  * </p>
  * 
  * @author lchan
@@ -56,11 +56,10 @@ public class IndexDocuments extends ElasticSearchProducer {
   @Override
   protected AdaptrisMessage doRequest(AdaptrisMessage msg, ProduceDestination destination, long timeout) throws ProduceException {
     try {
-      final String type = destination.getDestination(msg);
-      final String index = retrieveConnection(ElasticSearchConnection.class).getIndex();
+      final String index = destination.getDestination(msg);
       try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(documentBuilder.build(msg))) {
         docs.forEach(e -> {
-          IndexResponse response = transportClient.prepareIndex(index, type, e.uniqueId()).setRouting(e.routing())
+          IndexResponse response = transportClient.prepareIndex(index, e.type(), e.uniqueId()).setRouting(e.routing())
               .setParent(e.parent()).setSource(e.content()).get();
           log.trace("Added document {} version {} to {}", response.getId(), response.getVersion(), index);
         });

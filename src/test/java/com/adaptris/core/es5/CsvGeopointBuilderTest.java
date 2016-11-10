@@ -15,7 +15,7 @@ import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.es5.CSVWithGeoPointBuilder;
 import com.adaptris.core.es5.DocumentWrapper;
 import com.adaptris.core.es5.ElasticSearchProducer;
-import com.adaptris.core.es5.ToUpperCaseFieldNameMapper;
+import com.adaptris.core.es5.fields.ToUpperCaseFieldNameMapper;
 import com.adaptris.core.services.splitter.CloseableIterable;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;

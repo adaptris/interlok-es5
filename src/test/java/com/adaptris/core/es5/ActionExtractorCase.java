@@ -11,12 +11,12 @@ import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ServiceException;
-import com.adaptris.core.es5.ConfiguredAction;
 import com.adaptris.core.es5.DocumentAction;
 import com.adaptris.core.es5.DocumentWrapper;
-import com.adaptris.core.es5.JsonPathAction;
-import com.adaptris.core.es5.MappedAction;
-import com.adaptris.core.es5.MetadataAction;
+import com.adaptris.core.es5.actions.ConfiguredAction;
+import com.adaptris.core.es5.actions.JsonPathAction;
+import com.adaptris.core.es5.actions.MappedAction;
+import com.adaptris.core.es5.actions.MetadataAction;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairList;
 

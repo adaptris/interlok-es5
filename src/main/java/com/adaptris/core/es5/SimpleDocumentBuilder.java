@@ -8,13 +8,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.validation.constraints.NotNull;
+
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
+import com.adaptris.core.es5.types.ConfiguredTypeBuilder;
+import com.adaptris.core.es5.types.TypeBuilder;
+import com.adaptris.core.util.Args;
 import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -39,7 +45,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
 
   private transient Logger log = LoggerFactory.getLogger(this.getClass());
+  @NotNull
+  @AutoPopulated
+  private TypeBuilder typeBuilder;
 
+  public SimpleDocumentBuilder() {
+    setTypeBuilder(new ConfiguredTypeBuilder());
+
+  }
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
     List<DocumentWrapper> result = new ArrayList<>();
@@ -50,7 +63,7 @@ public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
       builder.field("metadata", filterIllegal(msg.getMessageHeaders()));
       builder.field("date", new Date());
       builder.endObject();
-      result.add(new DocumentWrapper(msg.getUniqueId(), builder));
+      result.add(new DocumentWrapper(msg.getUniqueId(), builder, getTypeBuilder().getType(msg)));
     }
     catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
@@ -66,4 +79,17 @@ public class SimpleDocumentBuilder implements ElasticDocumentBuilder {
     return result;
   }
 
+  /**
+   * @return the typeBuilder
+   */
+  public TypeBuilder getTypeBuilder() {
+    return typeBuilder;
+  }
+
+  /**
+   * @param typeBuilder the typeBuilder to set
+   */
+  public void setTypeBuilder(TypeBuilder typeBuilder) {
+    this.typeBuilder = Args.notNull(typeBuilder, "TypeBuilder");
+  }
 }

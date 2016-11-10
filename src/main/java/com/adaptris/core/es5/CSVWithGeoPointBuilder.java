@@ -18,8 +18,8 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.InputFieldDefault;
+import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.transform.csv.BasicFormatBuilder;
-import com.adaptris.core.transform.csv.FormatBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -40,7 +40,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("es5-csv-geopoint-document-builder")
-public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
+public class CSVWithGeoPointBuilder extends CSVWithTypeBuilder {
 
   @AdvancedConfig
   @InputFieldDefault(value = "latitude,lat")
@@ -58,12 +58,9 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   private String addTimestampField;
   
   public CSVWithGeoPointBuilder() {
-    this(new BasicFormatBuilder());
+    super();
+    setFormat(new BasicFormatBuilder());
   }
-
-  public CSVWithGeoPointBuilder(FormatBuilder f) {
-    setFormat(f);
-  }  
   
   public String getLatitudeFieldNames() {
     return latitudeFieldNames;
@@ -114,20 +111,22 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
   }
   
   @Override
-  protected CSVDocumentWrapper buildWrapper(CSVParser parser) {
+  protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception {
     Set<String> latitudeFieldNames = new HashSet<String>(Arrays.asList(latitudeFieldNames().toLowerCase().split(",")));
     Set<String> longitudeFieldNames = new HashSet<String>(Arrays.asList(longitudeFieldNames().toLowerCase().split(",")));
-    return new MyWrapper(latitudeFieldNames, longitudeFieldNames, parser);
+    return new MyWrapper(latitudeFieldNames, longitudeFieldNames, parser, getTypeBuilder().getType(msg));
   }
 
   private class MyWrapper extends CSVDocumentWrapper {
     private List<String> headers = new ArrayList<>();
     private LatLongHandler latLong;
+    private String type;
 
-    public MyWrapper(Set<String> latitudeFieldNames, Set<String> longitudeFieldNames, CSVParser p) {
+    public MyWrapper(Set<String> latitudeFieldNames, Set<String> longitudeFieldNames, CSVParser p, String type) {
       super(p);
       headers = buildHeaders(csvIterator.next());
       latLong = new LatLongHandler(latitudeFieldNames, longitudeFieldNames, headers);
+      this.type = type;
     }
 
     @Override
@@ -159,7 +158,7 @@ public class CSVWithGeoPointBuilder extends CSVDocumentBuilderImpl {
         }
         latLong.addLatLong(builder, record);
         builder.endObject();
-        result = new DocumentWrapper(uniqueId, builder);
+        result = new DocumentWrapper(uniqueId, builder, type);
       }
       catch (IOException e) {
         throw new RuntimeException(e);

@@ -5,7 +5,6 @@ import javax.validation.constraints.Min;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.update.UpdateRequestBuilder;
 
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AdvancedConfig;
@@ -14,6 +13,8 @@ import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
+import com.adaptris.core.es5.actions.ActionExtractor;
+import com.adaptris.core.es5.actions.ConfiguredAction;
 import com.adaptris.core.services.splitter.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -58,8 +59,7 @@ public class BulkIndexDocuments extends IndexDocuments {
   @Override
   protected AdaptrisMessage doRequest(AdaptrisMessage msg, ProduceDestination destination, long timeout) throws ProduceException {
     try {
-      final String type = destination.getDestination(msg);
-      final String index = retrieveConnection(ElasticSearchConnection.class).getIndex();
+      final String index = destination.getDestination(msg);
       BulkRequestBuilder bulkRequest = transportClient.prepareBulk();
       try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(getDocumentBuilder().build(msg))) {
         int count = 0;
@@ -68,17 +68,17 @@ public class BulkIndexDocuments extends IndexDocuments {
           DocumentAction action = DocumentAction.valueOf(getAction().extract(msg, doc));
           switch(action) {
           case INDEX:
-            bulkRequest.add(transportClient.prepareIndex(index, type, doc.uniqueId()).setRouting(doc.routing())
+            bulkRequest.add(transportClient.prepareIndex(index, doc.type(), doc.uniqueId()).setRouting(doc.routing())
                 .setParent(doc.parent()).setSource(doc.content()));
             break;
           case UPDATE:
-            bulkRequest.add(transportClient.prepareUpdate(index, type, doc.uniqueId()).setRouting(doc.routing())
+            bulkRequest.add(transportClient.prepareUpdate(index, doc.type(), doc.uniqueId()).setRouting(doc.routing())
                 .setParent(doc.parent()).setDoc(doc.content()));
-            UpdateRequestBuilder b = transportClient.prepareUpdate(index, type, doc.uniqueId());
             break;
           case DELETE:
             bulkRequest
-                .add(transportClient.prepareDelete(index, type, doc.uniqueId()).setRouting(doc.routing()).setParent(doc.parent()));
+                .add(transportClient.prepareDelete(index, doc.type(), doc.uniqueId()).setRouting(doc.routing())
+                    .setParent(doc.parent()));
             break;
           default:
             throw new ProduceException("Unrecognized action: " + action);

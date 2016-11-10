@@ -15,7 +15,6 @@ import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.lease.Releasable;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.hibernate.validator.constraints.NotBlank;
 
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AdvancedConfig;
@@ -40,7 +39,7 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 @ComponentProfile(summary = "Connection to an ElasticSearch 5.x instance", tag = "connections,elastic")
 @DisplayOrder(order =
 {
-    "index", "transport-url", "settings"
+    "transport-url", "settings"
 })
 public class ElasticSearchConnection extends NoOpConnection {
 
@@ -65,17 +64,9 @@ public class ElasticSearchConnection extends NoOpConnection {
   @AdvancedConfig
   private TransportClientFactory transportClientFactory;
 
-  @NotBlank
-  private String index = null;
-
   public ElasticSearchConnection() {
     setTransportUrls(new ArrayList<String>());
     setSettings(new KeyValuePairSet());
-  }
-
-  public ElasticSearchConnection(String index) {
-    this();
-    setIndex(index);
   }
 
   protected TransportClient createClient() throws CoreException {
@@ -107,14 +98,6 @@ public class ElasticSearchConnection extends NoOpConnection {
 
   public void addTransportUrl(String url) {
     transportUrls.add(Args.notNull(url, "URL"));
-  }
-
-  public String getIndex() {
-    return index;
-  }
-
-  public void setIndex(String index) {
-    this.index = Args.notBlank(index, "index");
   }
 
   /**

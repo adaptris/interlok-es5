@@ -23,6 +23,8 @@ import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
+import com.adaptris.core.es5.fields.FieldNameMapper;
+import com.adaptris.core.es5.fields.NoOpFieldNameMapper;
 import com.adaptris.core.services.splitter.CloseableIterable;
 import com.adaptris.core.transform.csv.BasicFormatBuilder;
 import com.adaptris.core.transform.csv.FormatBuilder;
@@ -97,7 +99,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     try {
       CSVFormat format = getFormat().createFormat();
       CSVParser parser = format.parse(msg.getReader());
-      result = buildWrapper(parser);
+      result = buildWrapper(parser, msg);
     }
     catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
@@ -105,7 +107,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
     return result;
   }
 
-  protected abstract CSVDocumentWrapper buildWrapper(CSVParser parser);
+  protected abstract CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception;
   
   public FieldNameMapper getFieldNameMapper() {
     return fieldNameMapper;

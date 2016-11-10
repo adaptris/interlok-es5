@@ -13,6 +13,7 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.InputFieldDefault;
+import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.transform.csv.BasicFormatBuilder;
 import com.adaptris.core.transform.csv.FormatBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -35,18 +36,18 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("es5-csv-document-builder")
-public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
-
+public class CSVDocumentBuilder extends CSVWithTypeBuilder {
 
   @AdvancedConfig
   @InputFieldDefault(value = "true")
   private Boolean useHeaderRecord;
 
   public CSVDocumentBuilder() {
-    this(new BasicFormatBuilder());
+    setFormat(new BasicFormatBuilder());
   }
 
   public CSVDocumentBuilder(FormatBuilder f) {
+    this();
     setFormat(f);
   }
 
@@ -68,18 +69,20 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
   }
 
   @Override
-  protected CSVDocumentWrapper buildWrapper(CSVParser parser) {
-    return new MyWrapper(parser);
+  protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception {
+    return new MyWrapper(parser, getTypeBuilder().getType(msg));
   }
 
   private class MyWrapper extends CSVDocumentWrapper {
     private List<String> headers = new ArrayList<>();
+    private String type;
 
-    public MyWrapper(CSVParser p) {
+    public MyWrapper(CSVParser p, String mytype) {
       super(p);
       if (useHeaderRecord()) {
         headers = buildHeaders(csvIterator.next());
       }
+      type = mytype;
     }
 
     @Override
@@ -104,14 +107,13 @@ public class CSVDocumentBuilder extends CSVDocumentBuilderImpl {
         }
         builder.endObject();
 
-        result = new DocumentWrapper(uniqueId, builder);
+        result = new DocumentWrapper(uniqueId, builder, type);
       }
       catch (IOException e) {
         throw new RuntimeException(e);
       }
       return result;
     }
-    
+
   }
-  
 }
