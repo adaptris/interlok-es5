@@ -6,7 +6,10 @@ import javax.validation.constraints.Min;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 
+import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AdvancedConfig;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
@@ -27,6 +30,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("es5-bulk-index-document")
+@AdapterComponent
+@ComponentProfile(summary = "Use the bulk API to produce to an ElasticSearch 5.x instance", tag = "producer,elastic,bulk")
+@DisplayOrder(order =
+{
+    "batchWindow", "action", "documentBuilder"
+})
 public class BulkIndexDocuments extends IndexDocuments {
 
   private static final int DEFAULT_BATCH_WINDOW = 10000;

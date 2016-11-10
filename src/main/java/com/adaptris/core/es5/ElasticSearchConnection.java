@@ -17,7 +17,11 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.hibernate.validator.constraints.NotBlank;
 
+import com.adaptris.annotation.AdapterComponent;
+import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.NoOpConnection;
 import com.adaptris.core.util.Args;
@@ -29,11 +33,23 @@ import com.thoughtworks.xstream.annotations.XStreamImplicit;
 
 /**
  * 
- * @author lchan
- * @config elasticsearch-connection
+ * @config es5-connection
  */
 @XStreamAlias("es5-connection")
+@AdapterComponent
+@ComponentProfile(summary = "Connection to an ElasticSearch 5.x instance", tag = "connections,elastic")
+@DisplayOrder(order =
+{
+    "index", "transport-url", "settings"
+})
 public class ElasticSearchConnection extends NoOpConnection {
+
+  private static final TransportClientFactory DEFAULT_CLIENT_FACTORY = new TransportClientFactory() {
+    @Override
+    public TransportClient create(Settings s) {
+      return new NettyTransportClient(s);
+    }
+  };
 
   @XStreamImplicit(itemFieldName = "transport-url")
   @Size(min = 1)
@@ -44,6 +60,10 @@ public class ElasticSearchConnection extends NoOpConnection {
   @AutoPopulated
   @Valid
   private KeyValuePairSet settings = null;
+
+  @Valid
+  @AdvancedConfig
+  private TransportClientFactory transportClientFactory;
 
   @NotBlank
   private String index = null;
@@ -62,7 +82,7 @@ public class ElasticSearchConnection extends NoOpConnection {
     // Settings s = Settings.settingsBuilder().put(asMap(getSettings())).build();
     // TransportClient transportClient = TransportClient.builder().settings(s).build();
     Settings s = Settings.builder().put(asMap(getSettings())).build();
-    TransportClient transportClient = new NettyTransportClient(s);
+    TransportClient transportClient = transportClientFactory().create(s);
     for (String url : getTransportUrls()) {
       transportClient.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(getHost(url), getPort(url))));
     }
@@ -95,6 +115,24 @@ public class ElasticSearchConnection extends NoOpConnection {
 
   public void setIndex(String index) {
     this.index = Args.notBlank(index, "index");
+  }
+
+  /**
+   * @return the transportClientFactory
+   */
+  public TransportClientFactory getTransportClientFactory() {
+    return transportClientFactory;
+  }
+
+  /**
+   * @param t the transportClientFactory to set
+   */
+  public void setTransportClientFactory(TransportClientFactory t) {
+    this.transportClientFactory = t;
+  }
+
+  TransportClientFactory transportClientFactory() {
+    return getTransportClientFactory() != null ? getTransportClientFactory() : DEFAULT_CLIENT_FACTORY;
   }
 
   protected void closeQuietly(TransportClient c) {
@@ -143,4 +181,5 @@ public class ElasticSearchConnection extends NoOpConnection {
     }
     return result;
   }
+
 }

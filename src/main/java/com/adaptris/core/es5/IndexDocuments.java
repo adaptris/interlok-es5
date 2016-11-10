@@ -7,6 +7,8 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.transport.TransportClient;
 
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.ComponentProfile;
+import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.ProduceDestination;
@@ -28,6 +30,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  *
  */
 @XStreamAlias("es5-index-document")
+@ComponentProfile(summary = "Use the standard API to produce to an ElasticSearch 5.x instance", tag = "producer,elastic")
+@DisplayOrder(order =
+{
+    "action", "documentBuilder"
+})
 public class IndexDocuments extends ElasticSearchProducer {
 
   protected transient TransportClient transportClient = null;

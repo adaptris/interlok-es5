@@ -32,7 +32,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * </p>
  * 
  * @author lchan
- * @config elasticsearch-simple-document-builder
+ * @config es5-simple-document-builder
  *
  */
 @XStreamAlias("es5-simple-document-builder")

@@ -2,7 +2,7 @@ package com.adaptris.core.es5;
 
 import java.io.IOException;
 
-import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotBlank;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
@@ -13,7 +13,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("es5-jsonpath-action")
 public class JsonPathAction implements ActionExtractor {
 
-  @NotNull
+  @NotBlank
   private String jsonPath;
   
   public JsonPathAction() {
