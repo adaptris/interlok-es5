@@ -44,4 +44,13 @@ public class DocumentWrapper {
     this.parent = parent;
   }
 
+  public DocumentWrapper withRouting(String r) {
+    setRouting(r);
+    return this;
+  }
+
+  public DocumentWrapper withParent(String p) {
+    setParent(p);
+    return this;
+  }
 }
