@@ -5,7 +5,6 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,8 +53,7 @@ public class CSVWithGeoPointBuilder extends CSVWithTypeBuilder {
   @InputFieldDefault(value = "location")
   private String locationFieldName;
 
-  @AdvancedConfig
-  private String addTimestampField;
+
   
   public CSVWithGeoPointBuilder() {
     super();
@@ -97,18 +95,6 @@ public class CSVWithGeoPointBuilder extends CSVWithTypeBuilder {
   private String locationFieldName() {
     return getLocationFieldName() != null ? getLocationFieldName() : "location";
   }
-
-  public String getAddTimestampField() {
-    return addTimestampField;
-  }
-
-  public void setAddTimestampField(String addTimestampField) {
-    this.addTimestampField = addTimestampField;
-  }
-  
-  private String addTimestampField() {
-    return getAddTimestampField() != null ? getAddTimestampField() : null;
-  }
   
   @Override
   protected CSVDocumentWrapper buildWrapper(CSVParser parser, AdaptrisMessage msg) throws Exception {
@@ -145,9 +131,7 @@ public class CSVWithGeoPointBuilder extends CSVWithTypeBuilder {
         XContentBuilder builder = jsonBuilder();
         builder.startObject();
         
-        if(addTimestampField() != null) {
-          builder.field(addTimestampField(), new Date().getTime());
-        }
+        addTimestamp(builder);
         
         for (int i = 0; i < record.size(); i++) {
           String fieldName = headers.size() > 0 ? headers.get(i) : "field_" + i;

@@ -27,12 +27,11 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * <li>The first record of the CSV is assumed to be a header row, and is used as the fieldName for each entry</li>
  * <li>The "unique-id" for the document is derived from the specified column, duplicates may have unexpected results depending on
  * your configuration.</li>
- * <li>{@code date} contains the current date/time</li>
  * </ul>
  * </p>
  * 
  * @author lchan
- * @config es5-simple-document-builder
+ * @config es5-csv-document-builder
  *
  */
 @XStreamAlias("es5-csv-document-builder")
@@ -100,6 +99,7 @@ public class CSVDocumentBuilder extends CSVWithTypeBuilder {
         String uniqueId = record.get(idField);
         XContentBuilder builder = jsonBuilder();
         builder.startObject();
+        addTimestamp(builder);
         for (int i = 0; i < record.size(); i++) {
           String fieldName = getFieldNameMapper().map(headers.size() > 0 ? headers.get(i) : "field_" + i);
           String data = record.get(i);
