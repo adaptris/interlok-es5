@@ -34,14 +34,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 {
     "batchWindow", "documentBuilder", "action",
 })
-public class BulkIndexDocuments extends IndexDocuments {
+public class BulkOperation extends SingleOperation {
 
   private static final int DEFAULT_BATCH_WINDOW = 10000;
 
   @Min(0)
   private Integer batchWindow;
 
-  public BulkIndexDocuments() {
+  public BulkOperation() {
     super();
   }
 

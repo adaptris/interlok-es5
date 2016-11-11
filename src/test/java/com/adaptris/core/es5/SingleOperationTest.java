@@ -7,11 +7,11 @@ import com.adaptris.core.es5.types.ConfiguredTypeBuilder;
 import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairSet;
 
-public class IndexDocumentTest extends ProducerCase {
+public class SingleOperationTest extends ProducerCase {
 
   private static final String EXAMPLE_COMMENT_HEADER = "\n<!--" + "\n-->\n";
 
-  public IndexDocumentTest(String name) {
+  public SingleOperationTest(String name) {
     super(name);
   }
 
@@ -29,7 +29,7 @@ public class IndexDocumentTest extends ProducerCase {
     esc.addTransportUrl("localhost:9301");
     esc.addTransportUrl("localhost:9302");
 
-    IndexDocuments producer = new IndexDocuments();
+    SingleOperation producer = new SingleOperation();
     producer.setDestination(new ConfiguredProduceDestination("myIndex"));
     producer.setDocumentBuilder(new SimpleDocumentBuilder(new ConfiguredTypeBuilder("myType")));
     return new StandaloneProducer(esc, producer);

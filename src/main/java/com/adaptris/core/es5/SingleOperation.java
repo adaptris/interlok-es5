@@ -45,7 +45,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 {
     "action", "documentBuilder"
 })
-public class IndexDocuments extends ElasticSearchProducer {
+public class SingleOperation extends ElasticSearchProducer {
   private static final ActionExtractor DEFAULT_ACTION = new ConfiguredAction(DocumentAction.INDEX);
 
   protected transient TransportClient transportClient = null;
@@ -59,7 +59,7 @@ public class IndexDocuments extends ElasticSearchProducer {
   @Valid
   private ActionExtractor action;
 
-  public IndexDocuments() {
+  public SingleOperation() {
     setDocumentBuilder(new SimpleDocumentBuilder());
   }
 
