@@ -30,9 +30,9 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * ElasticSearch; the {@code type} will be derived from the DocumentWrapper itself.
  * </p>
  * <p>
- * Of course, you can configure a {@link DocumentBuilder} implementation that creates multiple documents, but this will mean that
- * all operations are made individually using the standard single document API rather than the BULK API. For performance reasons you
- * should consider using {@link BulkIndexDocuments} where appropriate.
+ * Of course, you can configure a {@link ElasticDocumentBuilder} implementation that creates multiple documents, but this will mean
+ * that all operations are made individually using the standard single document API rather than the BULK API. For performance
+ * reasons you should consider using {@link BulkOperation} where appropriate.
  * </p>
  * 
  * @author lchan
