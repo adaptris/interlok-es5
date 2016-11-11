@@ -1,20 +1,16 @@
 package com.adaptris.core.es5;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
 
 import com.adaptris.annotation.AdapterComponent;
-import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
-import com.adaptris.core.es5.actions.ActionExtractor;
-import com.adaptris.core.es5.actions.ConfiguredAction;
 import com.adaptris.core.services.splitter.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -33,22 +29,17 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  */
 @XStreamAlias("es5-bulk-operation")
 @AdapterComponent
-@ComponentProfile(summary = "Use the bulk API to produce to an ElasticSearch 5.x instance", tag = "producer,elastic,bulk")
+@ComponentProfile(summary = "Use the bulk API to interact with an ElasticSearch 5.x instance", tag = "producer,elastic,bulk,batch")
 @DisplayOrder(order =
 {
     "batchWindow", "documentBuilder", "action",
 })
 public class BulkIndexDocuments extends IndexDocuments {
 
-  private static final ActionExtractor DEFAULT_ACTION = new ConfiguredAction(DocumentAction.INDEX);
   private static final int DEFAULT_BATCH_WINDOW = 10000;
 
   @Min(0)
   private Integer batchWindow;
-  
-  @AdvancedConfig
-  @Valid
-  private ActionExtractor action;
 
   public BulkIndexDocuments() {
     super();
@@ -127,22 +118,4 @@ public class BulkIndexDocuments extends IndexDocuments {
     return getBatchWindow() != null ? getBatchWindow().intValue() : DEFAULT_BATCH_WINDOW;
   }
 
-
-  public ActionExtractor getAction() {
-    return action;
-  }
-
-
-  /**
-   * Set the action to be performed in the event the {@link DocumentWrapper} does not specify it.
-   * 
-   * @param action the action, the default will be to INDEX
-   */
-  public void setAction(ActionExtractor action) {
-    this.action = action;
-  }
-
-  protected ActionExtractor actionExtractor() {
-    return getAction() != null ? getAction() : DEFAULT_ACTION;
-  }
 }

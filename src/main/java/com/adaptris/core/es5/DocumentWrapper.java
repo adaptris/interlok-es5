@@ -65,6 +65,11 @@ public class DocumentWrapper {
     return this;
   }
 
+  /**
+   * The action to be taken with this document
+   * 
+   * @return the action associated with the Document.
+   */
   public DocumentAction action() {
     return action;
   }
