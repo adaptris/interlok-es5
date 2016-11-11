@@ -20,26 +20,27 @@ import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
- * Add a document(s) to ElasticSearch.
+ * Index/Delete/Update a document(s) to ElasticSearch.
  * 
  * <p>
- * {@link ProduceDestination#getDestination(AdaptrisMessage)} should return the type of document that we are submitting to into
- * ElasticSearch; the {@code index} is taken from the underlying {@link ElasticSearchConnection}.
+ * {@link ProduceDestination#getDestination(AdaptrisMessage)} should return the index that the documents will be inserted against
+ * ElasticSearch; the {@code type} is taken from the DocumentBuilder
  * </p>
  * 
  * @author lchan
- * @config es5-bulk-index-document
+ * @config es5-bulk-operation
  *
  */
-@XStreamAlias("es5-bulk-index-document")
+@XStreamAlias("es5-bulk-operation")
 @AdapterComponent
 @ComponentProfile(summary = "Use the bulk API to produce to an ElasticSearch 5.x instance", tag = "producer,elastic,bulk")
 @DisplayOrder(order =
 {
-    "batchWindow", "action", "documentBuilder"
+    "batchWindow", "documentBuilder", "action",
 })
 public class BulkIndexDocuments extends IndexDocuments {
 
+  private static final ActionExtractor DEFAULT_ACTION = new ConfiguredAction(DocumentAction.INDEX);
   private static final int DEFAULT_BATCH_WINDOW = 10000;
 
   @Min(0)
@@ -51,9 +52,6 @@ public class BulkIndexDocuments extends IndexDocuments {
 
   public BulkIndexDocuments() {
     super();
-    ConfiguredAction ca = new ConfiguredAction();
-    ca.setAction(DocumentAction.INDEX);
-    setAction(ca);
   }
 
   @Override
@@ -65,7 +63,7 @@ public class BulkIndexDocuments extends IndexDocuments {
         int count = 0;
         for (DocumentWrapper doc : docs) {
           count++;
-          DocumentAction action = DocumentAction.valueOf(getAction().extract(msg, doc));
+          DocumentAction action = doc.action() != null ? doc.action() : DocumentAction.valueOf(actionExtractor().extract(msg, doc));
           switch(action) {
           case INDEX:
             bulkRequest.add(transportClient.prepareIndex(index, doc.type(), doc.uniqueId()).setRouting(doc.routing())
@@ -135,8 +133,16 @@ public class BulkIndexDocuments extends IndexDocuments {
   }
 
 
+  /**
+   * Set the action to be performed in the event the {@link DocumentWrapper} does not specify it.
+   * 
+   * @param action the action, the default will be to INDEX
+   */
   public void setAction(ActionExtractor action) {
     this.action = action;
   }
 
+  protected ActionExtractor actionExtractor() {
+    return getAction() != null ? getAction() : DEFAULT_ACTION;
+  }
 }

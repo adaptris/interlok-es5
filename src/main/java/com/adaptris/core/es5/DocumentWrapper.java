@@ -7,6 +7,7 @@ public class DocumentWrapper {
   private final String uniqueId;
   private String routing;
   private String parent;
+  private DocumentAction action;
   private final String type;
   private final XContentBuilder content;
   
@@ -53,4 +54,24 @@ public class DocumentWrapper {
     setParent(p);
     return this;
   }
+
+  public DocumentWrapper withAction(String s) {
+    setAction(DocumentAction.valueOf(s));
+    return this;
+  }
+
+  public DocumentWrapper withAction(DocumentAction a) {
+    setAction(a);
+    return this;
+  }
+
+  public DocumentAction action() {
+    return action;
+  }
+
+  public void setAction(DocumentAction action) {
+    this.action = action;
+  }
+  
+
 }
