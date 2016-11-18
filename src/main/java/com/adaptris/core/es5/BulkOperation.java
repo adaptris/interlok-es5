@@ -32,7 +32,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @ComponentProfile(summary = "Use the bulk API to interact with an ElasticSearch 5.x instance", tag = "producer,elastic,bulk,batch")
 @DisplayOrder(order =
 {
-    "batchWindow", "documentBuilder", "action",
+    "batchWindow", "documentBuilder", "action", "refreshPolicy"
 })
 public class BulkOperation extends SingleOperation {
 
@@ -49,7 +49,7 @@ public class BulkOperation extends SingleOperation {
   protected AdaptrisMessage doRequest(AdaptrisMessage msg, ProduceDestination destination, long timeout) throws ProduceException {
     try {
       final String index = destination.getDestination(msg);
-      BulkRequestBuilder bulkRequest = transportClient.prepareBulk();
+      BulkRequestBuilder bulkRequest = transportClient.prepareBulk().setRefreshPolicy(getRefreshPolicy());
       try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(getDocumentBuilder().build(msg))) {
         int count = 0;
         for (DocumentWrapper doc : docs) {
@@ -75,7 +75,7 @@ public class BulkOperation extends SingleOperation {
           if (count >= batchWindow()) {
             doSend(bulkRequest);
             count = 0;
-            bulkRequest = transportClient.prepareBulk();
+            bulkRequest = transportClient.prepareBulk().setRefreshPolicy(getRefreshPolicy());
           }
         }
       }

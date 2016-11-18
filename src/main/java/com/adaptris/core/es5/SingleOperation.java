@@ -43,7 +43,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @ComponentProfile(summary = "Use the standard API to interact with an ElasticSearch 5.x instance", tag = "producer,elastic")
 @DisplayOrder(order =
 {
-    "action", "documentBuilder"
+    "action", "documentBuilder", "refreshPolicy"
 })
 public class SingleOperation extends ElasticSearchProducer {
   private static final ActionExtractor DEFAULT_ACTION = new ConfiguredAction(DocumentAction.INDEX);
@@ -58,6 +58,9 @@ public class SingleOperation extends ElasticSearchProducer {
   @AdvancedConfig
   @Valid
   private ActionExtractor action;
+
+  @AdvancedConfig
+  private String refreshPolicy;
 
   public SingleOperation() {
     setDocumentBuilder(new SimpleDocumentBuilder());
@@ -77,19 +80,19 @@ public class SingleOperation extends ElasticSearchProducer {
           switch (action) {
           case INDEX: {
             IndexResponse response = transportClient.prepareIndex(index, doc.type(), doc.uniqueId()).setRouting(doc.routing())
-                .setParent(doc.parent()).setSource(doc.content()).get();
+                .setParent(doc.parent()).setSource(doc.content()).setRefreshPolicy(getRefreshPolicy()).get();
             log.trace("INDEX:: document {} version {} in {}", response.getId(), response.getVersion(), index);
             break;
           }
           case UPDATE: {
             UpdateResponse response = transportClient.prepareUpdate(index, doc.type(), doc.uniqueId()).setRouting(doc.routing())
-                .setParent(doc.parent()).setDoc(doc.content()).get();
+                .setParent(doc.parent()).setDoc(doc.content()).setRefreshPolicy(getRefreshPolicy()).get();
             log.trace("UPDATE:: document {} version {} in {}", response.getId(), response.getVersion(), index);
             break;
           }
           case DELETE: {
             DeleteResponse response = transportClient.prepareDelete(index, doc.type(), doc.uniqueId()).setRouting(doc.routing())
-                .setParent(doc.parent()).get();
+                .setParent(doc.parent()).setRefreshPolicy(getRefreshPolicy()).get();
             log.trace("DELETE:: document {} version {} in {}", response.getId(), response.getVersion(), index);
             break;
           }
@@ -146,5 +149,21 @@ public class SingleOperation extends ElasticSearchProducer {
 
   protected ActionExtractor actionExtractor() {
     return getAction() != null ? getAction() : DEFAULT_ACTION;
+  }
+
+  /**
+   * @return the refreshPolicy
+   */
+  public String getRefreshPolicy() {
+    return refreshPolicy;
+  }
+
+  /**
+   * Set the refresh policy.
+   * 
+   * @param s the refreshPolicy to set, generally "true", "false" or "wait_until", default is null.
+   */
+  public void setRefreshPolicy(String s) {
+    this.refreshPolicy = s;
   }
 }
