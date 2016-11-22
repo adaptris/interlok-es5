@@ -5,7 +5,7 @@ ext {
   repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
   repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
   defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
-  componentName='Interlok ElasticSearch Integration'
+  componentName='Interlok ElasticSearch (5+) Integration'
   slf4jVersion = '1.7.12'
 }
 
