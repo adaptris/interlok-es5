@@ -2,9 +2,7 @@ package com.adaptris.core.es5;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.mail.URLName;
 import javax.validation.Valid;
@@ -24,7 +22,6 @@ import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.NoOpConnection;
 import com.adaptris.core.util.Args;
-import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairBag;
 import com.adaptris.util.KeyValuePairSet;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -72,7 +69,7 @@ public class ElasticSearchConnection extends NoOpConnection {
   protected TransportClient createClient() throws CoreException {
     // Settings s = Settings.settingsBuilder().put(asMap(getSettings())).build();
     // TransportClient transportClient = TransportClient.builder().settings(s).build();
-    Settings s = Settings.builder().put(asMap(getSettings())).build();
+    Settings s = Settings.builder().put(KeyValuePairBag.asMap(getSettings())).build();
     TransportClient transportClient = transportClientFactory().create(s);
     for (String url : getTransportUrls()) {
       transportClient.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(getHost(url), getPort(url))));
@@ -131,14 +128,6 @@ public class ElasticSearchConnection extends NoOpConnection {
     catch (Exception e) {
       ;
     }
-  }
-
-  private static Map<String, String> asMap(KeyValuePairBag kvps) {
-    Map<String, String> result = new HashMap<>();
-    for (KeyValuePair kvp : kvps.getKeyValuePairs()) {
-      result.put(kvp.getKey(), kvp.getValue());
-    }
-    return result;
   }
 
   private static String getHost(String hostUrl) {
