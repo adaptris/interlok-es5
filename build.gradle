@@ -1,0 +1,157 @@
+ext {
+  adpCoreVersion = project.hasProperty('adpCoreVersion') ? project.getProperty('adpCoreVersion') : '3.5-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.5-SNAPSHOT'
+  mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : 'https://development.adaptris.net/nexus/content/repositories/snapshots'
+  repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
+  repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
+  defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
+  componentName='Interlok ElasticSearch (5+) Integration'
+  slf4jVersion = '1.7.12'
+}
+
+if (JavaVersion.current().isJava8Compatible()) {
+  allprojects {
+    tasks.withType(Javadoc) {
+      options.addStringOption('Xdoclint:none', '-quiet')
+    }
+  }
+}
+
+apply plugin: 'java'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
+apply plugin: "jacoco"
+
+sourceCompatibility = 1.8
+group   = 'com.adaptris'
+version = releaseVersion
+def versionDir = "$buildDir/version"
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+  maven { url "$defaultNexusRepo" }
+  maven { url "https://development.adaptris.net/nexus/content/groups/public" }
+  maven {
+    credentials {
+      username repoUsername
+      password repoPassword
+    }
+    url "https://development.adaptris.net/nexus/content/groups/private"
+  }
+  maven { url "https://development.adaptris.net/nexus/content/repositories/snapshots" }
+  maven { url "https://development.adaptris.net/nexus/content/repositories/releases" }
+}
+
+
+configurations {
+  javadoc {}
+  all*.exclude group: 'c3p0'
+  all*.exclude group: 'commons-logging'
+  all*.exclude group: 'javamail'
+  all*.exclude group: 'javax.mail', module: 'mail'
+}
+
+dependencies {
+  compile ("com.adaptris:adp-core:$adpCoreVersion") { changing= true}
+  compile ("org.slf4j:slf4j-api:$slf4jVersion")
+  compile ("com.adaptris:adp-simple-csv:$adpCoreVersion") { changing=true}
+  compile ("org.elasticsearch:elasticsearch:5.0.0")
+  // compile ("org.elasticsearch.plugin:transport-netty3-client:5.0.0")
+  // compile ("io.netty:netty:3.10.6.Final")
+  compile ("org.elasticsearch.plugin:transport-netty4-client:5.0.0")
+  compile ("io.netty:netty-all:4.1.5.Final")
+  compile ("com.jayway.jsonpath:json-path:2.2.0")
+  // Added in all the lucene things because otherwise
+  // the ES stuff barfs... They haven't got their dependencies
+  // declared properly.
+  compile ("org.apache.lucene:lucene-core:6.2.0")
+  compile ("org.apache.lucene:lucene-analyzers-common:6.2.0")
+  compile ("org.apache.lucene:lucene-queryparser:6.2.0")
+  compile ("org.apache.lucene:lucene-queries:6.2.0")
+  compile ("org.apache.lucene:lucene-highlighter:6.2.0")
+  compile ("org.apache.lucene:lucene-memory:6.2.0")
+  compile ("org.apache.lucene:lucene-spatial:6.2.0")
+  compile ("org.apache.lucene:lucene-spatial-extras:6.2.0")
+  compile ("org.apache.lucene:lucene-spatial3d:6.2.0")
+  compile ("org.apache.lucene:lucene-join:6.2.0")
+  compile ("org.apache.lucene:lucene-grouping:6.2.0")
+  compile ("org.apache.lucene:lucene-backward-codecs:6.2.0")
+  compile ("org.apache.lucene:lucene-misc:6.2.0")
+  compile ("org.apache.lucene:lucene-sandbox:6.2.0")
+  compile ("org.apache.lucene:lucene-suggest:6.2.0")
+
+  testCompile ('junit:junit:4.11')
+  testCompile ("com.adaptris:adp-stubs:$adpCoreVersion") { changing= true}
+  testCompile ("com.fasterxml.jackson.core:jackson-databind:2.7.0")
+
+  javadoc("com.adaptris:adp-core-apt:$adpCoreVersion") { changing= true}
+}
+
+
+sourceSets {
+  main {
+    output.dir(versionDir, builtBy: 'generateVersion')
+  }
+}
+// Generate the META-INF/adaptris-version file
+task generateVersion {
+  doLast {
+    def versionFile = new File(new File(versionDir, 'META-INF'), 'adaptris-version')
+    versionFile.getParentFile().mkdirs()
+    ant.propertyfile(file: versionFile) {
+      entry(key: 'component.name', value: componentName)
+      entry(key: 'build.version', value: releaseVersion)
+      entry(key: 'build.date', value: new Date().format('yyyy-MM-dd'))
+    }
+  }
+}
+
+javadoc {
+  configure(options) {
+    links = [
+            "http://development.adaptris.com/javadocs/v3-snapshot/Interlok-API/",
+            "http://development.adaptris.net/javadocs/v3-snapshot/Interlok-Common/",
+    ]
+    taglets = ["com.adaptris.taglet.ConfigTaglet", "com.adaptris.taglet.LicenseTaglet"]
+    options.addStringOption "tagletpath", configurations.javadoc.asPath
+  }
+}
+
+jacoco {
+  toolVersion="0.7.7.201606060606"
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+  classifier = 'javadoc'
+  from javadoc.destinationDir
+}
+
+task examplesJar(type: Jar, dependsOn: test) {
+  classifier = 'examples'
+  from new File(buildDir, '/examples')
+}
+
+artifacts {
+  archives javadocJar
+  archives examplesJar
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+
+      artifact javadocJar { classifier "javadoc" }
+      artifact examplesJar { classifier "examples" }
+    }
+  }
+  repositories {
+    maven {
+      credentials {
+        username repoUsername
+        password repoPassword
+      }
+      url mavenPublishUrl
+    }
+  }
+}
