@@ -5,7 +5,9 @@ ext {
   repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
   repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
   defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
-  componentName='Interlok ElasticSearch (5+) Integration'
+  componentName='Interlok/ElasticSearch (5+) Integration'
+  organizationName = "Adaptris Ltd"
+  organizationUrl = "http://interlok.adaptris.net"
   slf4jVersion = '1.7.12'
 }
 
@@ -51,6 +53,10 @@ configurations {
   all*.exclude group: 'javax.mail', module: 'mail'
 }
 
+configurations.all {
+  resolutionStrategy.cacheChangingModulesFor 0, "seconds"
+}
+
 dependencies {
   compile ("com.adaptris:adp-core:$adpCoreVersion") { changing= true}
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
@@ -85,6 +91,18 @@ dependencies {
   testCompile ("com.fasterxml.jackson.core:jackson-databind:2.7.0")
 
   javadoc("com.adaptris:adp-core-apt:$adpCoreVersion") { changing= true}
+}
+
+
+jar {
+  manifest {
+    attributes("Built-By": System.getProperty('user.name'),
+               "Build-Jdk": System.getProperty('java.version'),
+               "Implementation-Title": componentName,
+               "Implementation-Version": project.version,
+               "Implementation-Vendor-Id": project.group,
+               "Implementation-Vendor": organizationName)
+  }
 }
 
 
@@ -143,6 +161,13 @@ publishing {
 
       artifact javadocJar { classifier "javadoc" }
       artifact examplesJar { classifier "examples" }
+
+      pom.withXml {
+        asNode().appendNode("description", "Connect and insert documents into ElasticSearch v5+")
+        def properties = asNode().appendNode("properties")
+        properties.appendNode("externalUrl", "https://www.elastic.co/products/elasticsearch")
+        properties.appendNode("target", "3.5.0+")
+      }
     }
   }
   repositories {
