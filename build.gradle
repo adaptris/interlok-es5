@@ -163,7 +163,7 @@ publishing {
       artifact examplesJar { classifier "examples" }
 
       pom.withXml {
-        asNode().appendNode("description", "Connect and insert documents into ElasticSearch v5+")
+        asNode().appendNode("description", "Connect and insert documents into ElasticSearch v5+ via version 5.x of their API")
         def properties = asNode().appendNode("properties")
         properties.appendNode("externalUrl", "https://www.elastic.co/products/elasticsearch")
         properties.appendNode("target", "3.5.0+")
