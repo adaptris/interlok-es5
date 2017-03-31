@@ -66,6 +66,12 @@ public class SingleOperation extends ElasticSearchProducer {
     setDocumentBuilder(new SimpleDocumentBuilder());
   }
 
+  public SingleOperation(ProduceDestination dest, ElasticDocumentBuilder b) {
+    this();
+    setDestination(dest);
+    setDocumentBuilder(b);
+  }
+
   public void produce(AdaptrisMessage msg, ProduceDestination destination) throws ProduceException {
     request(msg, destination, defaultTimeout());
   }

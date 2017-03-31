@@ -2,6 +2,7 @@ package com.adaptris.core.es5;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.mail.URLName;
@@ -64,6 +65,12 @@ public class ElasticSearchConnection extends NoOpConnection {
   public ElasticSearchConnection() {
     setTransportUrls(new ArrayList<String>());
     setSettings(new KeyValuePairSet());
+  }
+
+  public ElasticSearchConnection(KeyValuePairSet settings, String... transportUrls) {
+    this();
+    setSettings(settings);
+    setTransportUrls(new ArrayList<String>(Arrays.asList(transportUrls)));
   }
 
   protected TransportClient createClient() throws CoreException {

@@ -18,7 +18,10 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
+import com.adaptris.core.es5.types.ConfiguredTypeBuilder;
+import com.adaptris.core.es5.types.TypeBuilder;
 import com.adaptris.core.transform.csv.BasicFormatBuilder;
+import com.adaptris.core.transform.csv.FormatBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -53,13 +56,24 @@ public class CSVWithGeoPointBuilder extends CSVWithTypeBuilder {
   @InputFieldDefault(value = "location")
   private String locationFieldName;
 
-
-  
   public CSVWithGeoPointBuilder() {
-    super();
-    setFormat(new BasicFormatBuilder());
+    this(new BasicFormatBuilder(), new ConfiguredTypeBuilder());
   }
-  
+
+  public CSVWithGeoPointBuilder(TypeBuilder typeBuilder) {
+    this(new BasicFormatBuilder(), typeBuilder);
+  }
+
+  public CSVWithGeoPointBuilder(FormatBuilder f) {
+    this(f, new ConfiguredTypeBuilder());
+  }
+
+  public CSVWithGeoPointBuilder(FormatBuilder f, TypeBuilder typeBuilder) {
+    super();
+    setFormat(f);
+    setTypeBuilder(typeBuilder);
+  }
+
   public String getLatitudeFieldNames() {
     return latitudeFieldNames;
   }
