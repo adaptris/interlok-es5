@@ -27,7 +27,7 @@ public class NettyTransportClient extends TransportClient {
   }
 
   public NettyTransportClient(Settings settings, Collection<Class<? extends Plugin>> plugins) {
-    super(settings, Settings.EMPTY, addPlugins(plugins, PRE_INSTALLED_PLUGINS));
+    super(settings, addPlugins(plugins, PRE_INSTALLED_PLUGINS));
   }
 
   @Override
