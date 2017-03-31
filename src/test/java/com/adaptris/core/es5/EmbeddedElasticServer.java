@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import com.adaptris.core.PortManager;
 import com.adaptris.util.KeyValuePair;
@@ -65,7 +66,7 @@ public class EmbeddedElasticServer {
 
   public void start() throws IOException, InterruptedException {
     try {
-      instance = builder.build();
+      instance = builder.withStartTimeout(120, TimeUnit.SECONDS).build();
       instance.start();
     }
     catch (IOException | InterruptedException e) {
