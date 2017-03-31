@@ -53,9 +53,8 @@ public class ElasticOperationsTest {
   @Test
   public void testSingleOperation() throws Exception {
     ElasticSearchConnection conn = ES_SERVER.createConnection();
-    SingleOperation producer = new SingleOperation();
-    producer.setDestination(new ConfiguredProduceDestination(SINGLE_OP_INDEX));
-    producer.setDocumentBuilder(new SimpleDocumentBuilder(new ConfiguredTypeBuilder(SINGLE_OP_MAPPING)));
+    SingleOperation producer = new SingleOperation(new ConfiguredProduceDestination(SINGLE_OP_INDEX),
+        new SimpleDocumentBuilder(new ConfiguredTypeBuilder(SINGLE_OP_MAPPING)));
     StandaloneProducer esProducer = new StandaloneProducer(conn, producer);
     try {
       TransportClient client = conn.createClient();
@@ -91,11 +90,10 @@ public class ElasticOperationsTest {
   @Test
   public void testBulkOperation_CSV() throws Exception {
     ElasticSearchConnection conn = ES_SERVER.createConnection();
-    BulkOperation producer = new BulkOperation();
-    producer.setDestination(new ConfiguredProduceDestination(BULK_OP_INDEX));
+    BulkOperation producer = new BulkOperation(new ConfiguredProduceDestination(BULK_OP_INDEX),
+        new CSVDocumentBuilder(new ConfiguredTypeBuilder(BULK_OP_MAPPING)));
     producer.setAction(new ConfiguredAction(DocumentAction.INDEX));
-    producer.setBatchWindow(3);
-    producer.setDocumentBuilder(new CSVDocumentBuilder(new ConfiguredTypeBuilder(BULK_OP_MAPPING)));
+    producer.setBatchWindow(2);
     StandaloneProducer esProducer = new StandaloneProducer(conn, producer);
 
     try {
@@ -131,11 +129,9 @@ public class ElasticOperationsTest {
   @Test
   public void testBulkOperation_CSV_WithGeoPoint() throws Exception {
     ElasticSearchConnection conn = ES_SERVER.createConnection();
-    BulkOperation producer = new BulkOperation();
-    producer.setDestination(new ConfiguredProduceDestination(BULK_OP_GEO_INDEX));
+    BulkOperation producer = new BulkOperation(new ConfiguredProduceDestination(BULK_OP_GEO_INDEX),
+        new CSVWithGeoPointBuilder(new ConfiguredTypeBuilder(BULK_OP_GEO_MAPPING)));
     producer.setAction(new ConfiguredAction(DocumentAction.INDEX));
-    producer.setBatchWindow(2);
-    producer.setDocumentBuilder(new CSVWithGeoPointBuilder(new ConfiguredTypeBuilder(BULK_OP_GEO_MAPPING)));
     StandaloneProducer esProducer = new StandaloneProducer(conn, producer);
     try {
       TransportClient client = conn.createClient();

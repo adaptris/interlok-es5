@@ -45,6 +45,10 @@ public class BulkOperation extends SingleOperation {
     super();
   }
 
+  public BulkOperation(ProduceDestination dest, ElasticDocumentBuilder b) {
+    super(dest, b);
+  }
+
   @Override
   protected AdaptrisMessage doRequest(AdaptrisMessage msg, ProduceDestination destination, long timeout) throws ProduceException {
     try {
