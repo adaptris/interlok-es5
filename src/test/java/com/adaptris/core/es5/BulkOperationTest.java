@@ -15,8 +15,11 @@ public class BulkOperationTest extends ProducerCase {
     super(name);
   }
 
-  public void testNoOp() throws Exception {
-
+  public void testRefreshPolicy() throws Exception {
+    BulkOperation producer = new BulkOperation();
+    assertNull(producer.getRefreshPolicy());
+    producer.setRefreshPolicy("wait_until");
+    assertEquals("wait_until", producer.getRefreshPolicy());
   }
 
   @Override

@@ -14,6 +14,8 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
+import com.adaptris.core.es5.types.ConfiguredTypeBuilder;
+import com.adaptris.core.es5.types.TypeBuilder;
 import com.adaptris.core.transform.csv.BasicFormatBuilder;
 import com.adaptris.core.transform.csv.FormatBuilder;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -42,12 +44,21 @@ public class CSVDocumentBuilder extends CSVWithTypeBuilder {
   private Boolean useHeaderRecord;
 
   public CSVDocumentBuilder() {
-    setFormat(new BasicFormatBuilder());
+    this(new BasicFormatBuilder(), new ConfiguredTypeBuilder());
+  }
+
+  public CSVDocumentBuilder(TypeBuilder typeBuilder) {
+    this(new BasicFormatBuilder(), typeBuilder);
   }
 
   public CSVDocumentBuilder(FormatBuilder f) {
-    this();
+    this(f, new ConfiguredTypeBuilder());
+  }
+
+  public CSVDocumentBuilder(FormatBuilder f, TypeBuilder typeBuilder) {
+    super();
     setFormat(f);
+    setTypeBuilder(typeBuilder);
   }
 
   public Boolean getUseHeaderRecord() {
