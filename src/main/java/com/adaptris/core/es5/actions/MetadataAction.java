@@ -6,6 +6,12 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.es5.DocumentWrapper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+/**
+ * Derive the action from metadata.
+ * 
+ * @config es5-metadata-action
+ *
+ */
 @XStreamAlias("es5-metadata-action")
 public class MetadataAction implements ActionExtractor {
 
