@@ -5,6 +5,12 @@ import org.hibernate.validator.constraints.NotBlank;
 import com.adaptris.core.AdaptrisMessage;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+/**
+ * Derive the type of document in the index (synomous with mapping) from metadata.
+ * 
+ * @config es5-metadata-type
+ *
+ */
 @XStreamAlias("es5-metadata-type")
 public class MetadataTypeBuilder implements TypeBuilder {
 

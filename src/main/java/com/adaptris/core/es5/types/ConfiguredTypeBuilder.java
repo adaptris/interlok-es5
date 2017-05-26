@@ -3,6 +3,12 @@ package com.adaptris.core.es5.types;
 import com.adaptris.core.AdaptrisMessage;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+/**
+ * A configured type of document in the index (synomous with mapping).
+ * 
+ * @config es5-configured-type
+ *
+ */
 @XStreamAlias("es5-configured-type")
 public class ConfiguredTypeBuilder implements TypeBuilder {
 

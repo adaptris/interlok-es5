@@ -11,6 +11,11 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+/**
+ * Extract the action using a json path.
+ * 
+ * @config es5-jsonpath-action
+ */
 @XStreamAlias("es5-jsonpath-action")
 public class JsonPathAction implements ActionExtractor {
 

@@ -8,6 +8,13 @@ import com.adaptris.core.es5.DocumentAction;
 import com.adaptris.core.es5.DocumentWrapper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
+/**
+ * 
+ * A Static configured action.
+ * 
+ * @config es5-configured-action
+ *
+ */
 @XStreamAlias("es5-configured-action")
 public class ConfiguredAction implements ActionExtractor {
 
