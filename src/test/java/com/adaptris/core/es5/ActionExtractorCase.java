@@ -24,9 +24,13 @@ public class ActionExtractorCase {
   public void testConstantAction() {
     for(DocumentAction val: DocumentAction.values()) {
       ConfiguredAction action = new ConfiguredAction();
-      action.setAction(val);
-      assertEquals(val.name(), action.extract(null, null));
+      action.setAction(val.name());
+      assertEquals(val.name(), action.extract(AdaptrisMessageFactory.getDefaultInstance().newMessage(), null));
     }
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
+    msg.addMetadata("key", "index");
+    ConfiguredAction action = new ConfiguredAction("%message{key}");
+    assertEquals("index", action.extract(msg, null));
   }
   
   @Test
@@ -65,13 +69,13 @@ public class ActionExtractorCase {
     action.setAction(ma);
     KeyValuePairList mappings = new KeyValuePairList();
     for(DocumentAction val: DocumentAction.values()) {
-      mappings.add(new KeyValuePair(val.name().substring(0, 1), val.name()));
+      mappings.add(new KeyValuePair(val.name().substring(0, 3), val.name()));
     }
     action.setMappings(mappings);
     
     for(DocumentAction val: DocumentAction.values()) {
       AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage();
-      msg.addMetadata(KEY, val.name().substring(0, 1));
+      msg.addMetadata(KEY, val.name().substring(0, 3));
       
       assertEquals(val, DocumentAction.valueOf(action.extract(msg, null)));
     }

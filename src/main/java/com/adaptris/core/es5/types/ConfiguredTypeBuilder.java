@@ -1,5 +1,8 @@
 package com.adaptris.core.es5.types;
 
+import org.hibernate.validator.constraints.NotBlank;
+
+import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -12,6 +15,8 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("es5-configured-type")
 public class ConfiguredTypeBuilder implements TypeBuilder {
 
+  @InputFieldHint(expression = true)
+  @NotBlank
   private String type;
 
   public ConfiguredTypeBuilder() {
@@ -33,7 +38,7 @@ public class ConfiguredTypeBuilder implements TypeBuilder {
 
   @Override
   public String getType(AdaptrisMessage msg) {
-    return getType();
+    return msg.resolve(getType());
   }
 
 }
