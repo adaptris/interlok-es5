@@ -26,6 +26,7 @@ public class BulkOperationTest extends ProducerCase {
   protected Object retrieveObjectForSampleConfig() {
     KeyValuePairSet settings = new KeyValuePairSet();
     settings.add(new KeyValuePair("cluster.name", "my-cluster"));
+    settings.add(new KeyValuePair("client.transport.sniff", "true"));
     ElasticSearchConnection esc = new ElasticSearchConnection();
     esc.setSettings(settings);
     esc.addTransportUrl("localhost:9300");
