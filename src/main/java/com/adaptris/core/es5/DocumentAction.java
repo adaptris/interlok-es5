@@ -5,4 +5,13 @@ package com.adaptris.core.es5;
  */
 // These are references by ordinal from the
 // "Delta_Status" column so the ordering in this enum is important!
-public enum DocumentAction { DELETE, UPDATE, INDEX }
+public enum DocumentAction {
+  /** Delete the document */
+  DELETE,
+  /** Update a document */
+  UPDATE,
+  /** Index a document */
+  INDEX,
+  /** Update or insert the document */
+  UPSERT
+}

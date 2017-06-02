@@ -7,6 +7,7 @@ import org.elasticsearch.action.delete.DeleteResponse;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.xcontent.XContentBuilder;
 
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
@@ -34,6 +35,14 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * that all operations are made individually using the standard single document API rather than the BULK API. For performance
  * reasons you should consider using {@link BulkOperation} where appropriate.
  * </p>
+ * <p>
+ * The action for each document is driven by the configured {@link ActionExtractor} instance. In the event of an
+ * {@link DocumentAction#UPSERT} action then the same {@link XContentBuilder} from the {@link DocumentWrapper} is used as both the
+ * update and upsert document via {@code setDoc(XContentBuilder}} and {@code setUpsert(XContentBuilder)}. This makes the assumption
+ * that the document generated contains all the data required, not just a subset. If in doubt; stick to a normal
+ * {@link DocumentAction#UPDATE} which will correctly throw a {@code DocumentMissingException}.
+ * </p>
+ * 
  * 
  * @author lchan
  * @config es5-single-operation
@@ -101,6 +110,11 @@ public class SingleOperation extends ElasticSearchProducer {
                 .setParent(doc.parent()).setRefreshPolicy(getRefreshPolicy()).get();
             log.trace("DELETE:: document {} version {} in {}", response.getId(), response.getVersion(), index);
             break;
+          }
+          case UPSERT: {
+            UpdateResponse response = transportClient.prepareUpdate(index, doc.type(), doc.uniqueId()).setRouting(doc.routing())
+                .setParent(doc.parent()).setDoc(doc.content()).setUpsert(doc.content()).get();
+            log.trace("UPSERT:: document {} version {} in {}", response.getId(), response.getVersion(), index);
           }
           default:
             throw new ProduceException("Unrecognized action: " + action);
