@@ -2,12 +2,17 @@ package com.adaptris.core.es5.actions;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ServiceException;
+import com.adaptris.core.es5.DocumentAction;
 import com.adaptris.core.es5.DocumentWrapper;
 import com.adaptris.util.KeyValuePairList;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
  * Map the action provided by the underlying {@link ActionExtractor} into a new value.
+ * <p>
+ * For instance metadata that indicates an {@link DocumentAction#INDEX} operation comes through as {@code INSERT}. Use a mapped
+ * action to map from INSERT to INDEX.
+ * </p>
  * 
  * @config es5-mapped-action
  */

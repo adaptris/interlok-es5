@@ -1,8 +1,9 @@
 package com.adaptris.core.es5.actions;
 
-import javax.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.NotBlank;
 
 import com.adaptris.annotation.AutoPopulated;
+import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.es5.DocumentAction;
 import com.adaptris.core.es5.DocumentWrapper;
@@ -18,29 +19,34 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("es5-configured-action")
 public class ConfiguredAction implements ActionExtractor {
 
-  @NotNull
+  @NotBlank
   @AutoPopulated
-  private DocumentAction action = DocumentAction.INDEX;
+  @InputFieldHint(expression = true)
+  private String action = DocumentAction.INDEX.name();
 
   public ConfiguredAction() {
 
   }
 
-  public ConfiguredAction(DocumentAction a) {
+  public ConfiguredAction(String a) {
     this();
     setAction(a);
   }
 
-  @Override
-  public String extract(AdaptrisMessage msg, DocumentWrapper document) {
-    return getAction().name();
+  public ConfiguredAction(DocumentAction a) {
+    this(a.name());
   }
 
-  public DocumentAction getAction() {
+  @Override
+  public String extract(AdaptrisMessage msg, DocumentWrapper document) {
+    return msg.resolve(getAction());
+  }
+
+  public String getAction() {
     return action;
   }
 
-  public void setAction(DocumentAction action) {
+  public void setAction(String action) {
     this.action = action;
   }
 

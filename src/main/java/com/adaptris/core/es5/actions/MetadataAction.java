@@ -1,7 +1,6 @@
 package com.adaptris.core.es5.actions;
 
-import javax.validation.constraints.NotNull;
-
+import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.es5.DocumentWrapper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
@@ -15,7 +14,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("es5-metadata-action")
 public class MetadataAction implements ActionExtractor {
 
-  @NotNull
+  @InputFieldDefault(value = "action")
   private String metadataKey;
 
   @Override
@@ -27,6 +26,11 @@ public class MetadataAction implements ActionExtractor {
     return metadataKey;
   }
 
+  /**
+   * Set the metadata key from which to derive the action.
+   * 
+   * @param metadataKey the key, default if not specified is {@code action}
+   */
   public void setMetadataKey(String metadataKey) {
     this.metadataKey = metadataKey;
   }
