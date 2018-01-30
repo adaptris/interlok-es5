@@ -13,7 +13,6 @@ import javax.validation.constraints.Size;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.lease.Releasable;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
 
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AdvancedConfig;
@@ -23,7 +22,7 @@ import com.adaptris.annotation.DisplayOrder;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.NoOpConnection;
 import com.adaptris.core.util.Args;
-import com.adaptris.util.KeyValuePairBag;
+import com.adaptris.util.KeyValuePair;
 import com.adaptris.util.KeyValuePairSet;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamImplicit;
@@ -76,10 +75,9 @@ public class ElasticSearchConnection extends NoOpConnection {
   protected TransportClient createClient() throws CoreException {
     // Settings s = Settings.settingsBuilder().put(asMap(getSettings())).build();
     // TransportClient transportClient = TransportClient.builder().settings(s).build();
-    Settings s = Settings.builder().put(KeyValuePairBag.asMap(getSettings())).build();
-    TransportClient transportClient = transportClientFactory().create(s);
+    TransportClient transportClient = transportClientFactory().create(createSettings());
     for (String url : getTransportUrls()) {
-      transportClient.addTransportAddress(new InetSocketTransportAddress(new InetSocketAddress(getHost(url), getPort(url))));
+      transportClient.addTransportAddress(TransportAddressFactory.create(new InetSocketAddress(getHost(url), getPort(url))));
     }
     return transportClient;
   }
@@ -135,6 +133,15 @@ public class ElasticSearchConnection extends NoOpConnection {
     catch (Exception e) {
       ;
     }
+  }
+
+  private Settings createSettings() {
+    // In ES 6.1.2 API, the put(Map<String,String>) method has gone away! (why)
+    Settings.Builder builder = Settings.builder();
+    for (KeyValuePair kvp : getSettings()) {
+      builder.put(kvp.getKey(), kvp.getValue());
+    }
+    return builder.build();
   }
 
   private static String getHost(String hostUrl) {
