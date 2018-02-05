@@ -77,12 +77,17 @@ public class EmbeddedElasticServer {
 
   public void stop() {
     if (instance != null) {
-      instance.stop();
-      PortManager.release(instance.getTransportTcpPort());
-      PortManager.release(instance.getHttpPort());
-      PortManager.release(tcpPort);
-      PortManager.release(httpPort);
-      instance = null;
+      try {
+        instance.stop();
+        PortManager.release(instance.getTransportTcpPort());
+        PortManager.release(instance.getHttpPort());
+        PortManager.release(tcpPort);
+        PortManager.release(httpPort);
+        instance = null;
+      }
+      catch (Exception e) {
+
+      }
     }
   }
 
