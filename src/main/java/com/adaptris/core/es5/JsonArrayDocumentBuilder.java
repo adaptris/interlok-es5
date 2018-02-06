@@ -8,9 +8,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.Iterator;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 import org.apache.commons.io.IOUtils;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.slf4j.Logger;
@@ -49,9 +46,6 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
 
   private transient Logger log = LoggerFactory.getLogger(this.getClass());
 
-  @Valid
-  @NotNull
-  private TypeBuilder typeBuilder;
   @AdvancedConfig
   private String addTimestampField;
   @AdvancedConfig
@@ -85,19 +79,6 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
     }
-  }
-
-  public TypeBuilder getTypeBuilder() {
-    return typeBuilder;
-  }
-
-  /**
-   * Set the type builder.
-   * 
-   * @param b
-   */
-  public void setTypeBuilder(TypeBuilder b) {
-    this.typeBuilder = b;
   }
 
   public String getAddTimestampField() {

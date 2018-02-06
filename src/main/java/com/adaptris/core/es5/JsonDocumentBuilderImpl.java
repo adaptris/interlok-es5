@@ -5,6 +5,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import java.io.IOException;
 import java.util.Date;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import org.elasticsearch.common.xcontent.NamedXContentRegistry;
@@ -28,6 +29,7 @@ public abstract class JsonDocumentBuilderImpl implements ElasticDocumentBuilder 
   protected transient Logger log = LoggerFactory.getLogger(this.getClass());
   @NotNull
   @AutoPopulated
+  @Valid
   private TypeBuilder typeBuilder;
   @AdvancedConfig
   private String addTimestampField;
