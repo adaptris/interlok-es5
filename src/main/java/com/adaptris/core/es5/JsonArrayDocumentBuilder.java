@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.Iterator;
 
 import org.apache.commons.io.IOUtils;
@@ -24,7 +25,13 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.PathNotFoundException;
+import com.jayway.jsonpath.ReadContext;
+import com.jayway.jsonpath.spi.json.JsonSmartJsonProvider;
+import com.jayway.jsonpath.spi.mapper.JacksonMappingProvider;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
 /**
@@ -54,6 +61,10 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
   @AdvancedConfig
   @InputFieldDefault(value = UID_PATH)
   private String uniqueIdJsonPath;
+  @AdvancedConfig
+  private String routingJsonPath;
+  @AdvancedConfig
+  private String parentJsonPath;
 
   public JsonArrayDocumentBuilder() {
 
@@ -135,9 +146,36 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     this.uniqueIdJsonPath = s;
   }
 
+  public String getRoutingJsonPath() {
+    return routingJsonPath;
+  }
+
+  /**
+   * Set the JSON path to extract the routing information.
+   * 
+   * @param path the path to routing information, defaults to null if not specified.
+   */
+  public void setRoutingJsonPath(String path) {
+    this.routingJsonPath = path;
+  }
+
+  public String getParentJsonPath() {
+    return parentJsonPath;
+  }
+
+  /**
+   * Set the JSON path to the parent ID.
+   * 
+   * @param path defaults to null if not specified.
+   */
+  public void setParentJsonPath(String path) {
+    this.parentJsonPath = path;
+  }
+
   String uidPath() {
     return !isBlank(getUniqueIdJsonPath()) ? getUniqueIdJsonPath() : UID_PATH;
   }
+
 
   private class JsonDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator<DocumentWrapper> {
     private String type;
@@ -145,6 +183,8 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     private final ObjectMapper mapper;
 
     private DocumentWrapper nextMessage;
+    private transient Configuration jsonConfig = new Configuration.ConfigurationBuilder().jsonProvider(new JsonSmartJsonProvider())
+        .mappingProvider(new JacksonMappingProvider()).options(EnumSet.noneOf(Option.class)).build();
 
     public JsonDocumentWrapper(ObjectMapper mapper, JsonParser parser, String type) {
       this.mapper = mapper;
@@ -167,13 +207,28 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
         addTimestamp(node);
         String jsonString = node.toString();
         XContentBuilder jsonContent = jsonBuilder(jsonString);
-        result = new DocumentWrapper(getUniqueId(jsonString), jsonContent, type);
+        ReadContext ctx = JsonPath.parse(jsonString, jsonConfig);
+        result = new DocumentWrapper(get(ctx, uidPath()), jsonContent, type).withParent(getQuietly(ctx, getParentJsonPath()))
+            .withRouting(getQuietly(ctx, getRoutingJsonPath()));
       }
       return result;
     }
 
-    private String getUniqueId(String json) {
-      return JsonPath.parse(json).read(uidPath());
+    private String get(ReadContext ctx, String path) {
+      return ctx.read(path);
+    }
+
+    private String getQuietly(ReadContext ctx, String path) {
+      String result = null;
+      if (isBlank(path)) {
+        return null;
+      }
+      try {
+        result = get(ctx, path);
+      } catch (PathNotFoundException e) {
+        result = null;
+      }
+      return result;
     }
 
     @Override
@@ -200,5 +255,6 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
       IOUtils.closeQuietly(parser);
     }
   }
+
 
 }

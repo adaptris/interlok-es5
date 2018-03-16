@@ -2,6 +2,7 @@ package com.adaptris.core.es5;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.fail;
 
 import org.apache.commons.io.IOUtils;
@@ -26,6 +27,8 @@ public class JsonDocumentBuilderTest extends BuilderCase {
       for (DocumentWrapper doc : docs) {
         count++;
         assertEquals(msg.getUniqueId(), doc.uniqueId());
+        assertNull(doc.routing());
+        assertNull(doc.parent());
         assertEquals("store", doc.type());
         ReadContext context = parse(doc.content().string());
         assertEquals("red", context.read("$.store.bicycle.color"));
@@ -57,17 +60,61 @@ public class JsonDocumentBuilderTest extends BuilderCase {
   public void testBuild_NotJson() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("Hello World");
     JsonDocumentBuilder documentBuilder = new JsonDocumentBuilder(new ConfiguredTypeBuilder("store"));
-    CloseableIterable<DocumentWrapper> docs = null; 
+    CloseableIterable<DocumentWrapper> docs = null;
     try {
       docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg));
       fail();
     } catch (ProduceException expected) {
-      
-    }
-    finally {
+
+    } finally {
       IOUtils.closeQuietly(docs);
     }
   }
+
+  @Test
+  public void testBuild_WithRouting() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(sampleJsonContent());
+    msg.addMetadata("routing", "MyRoute");
+    JsonDocumentBuilder documentBuilder = new JsonDocumentBuilder(new ConfiguredTypeBuilder("store"));
+    documentBuilder.setRouting("%message{routing}");
+    int count = 0;
+    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+      for (DocumentWrapper doc : docs) {
+        count++;
+        assertEquals(msg.getUniqueId(), doc.uniqueId());
+        assertNotNull(doc.routing());
+        assertNull(doc.parent());
+        assertEquals("store", doc.type());
+        assertEquals("MyRoute", doc.routing());
+        ReadContext context = parse(doc.content().string());
+        assertEquals("red", context.read("$.store.bicycle.color"));
+      }
+    }
+    assertEquals(1, count);
+  }
+
+  @Test
+  public void testBuild_WithParent() throws Exception {
+    AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(sampleJsonContent());
+    msg.addMetadata("parent", "MyTwoDads");
+    JsonDocumentBuilder documentBuilder = new JsonDocumentBuilder(new ConfiguredTypeBuilder("store"));
+    documentBuilder.setParent("%message{parent}");
+    int count = 0;
+    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+      for (DocumentWrapper doc : docs) {
+        count++;
+        assertEquals(msg.getUniqueId(), doc.uniqueId());
+        assertNull(doc.routing());
+        assertNotNull(doc.parent());
+        assertEquals("MyTwoDads", doc.parent());
+        assertEquals("store", doc.type());
+        ReadContext context = parse(doc.content().string());
+        assertEquals("red", context.read("$.store.bicycle.color"));
+      }
+    }
+    assertEquals(1, count);
+  }
+
 
   public static String sampleJsonContent() {
     return "{"

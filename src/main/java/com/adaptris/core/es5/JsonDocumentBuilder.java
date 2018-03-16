@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.elasticsearch.common.xcontent.XContentBuilder;
 
+import com.adaptris.annotation.AdvancedConfig;
+import com.adaptris.annotation.InputFieldHint;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.es5.types.TypeBuilder;
@@ -22,8 +24,10 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
  * <p>
  * The document that is created contains the following characteristics
  * <ul>
- * <li>The message's uniqueID is used as the ID of the document.
- * <li>The message payload is assumed to be a JSON object (not an array) and becomes the document..
+ * <li>The message's uniqueID is used as the ID of the document.</li>
+ * <li>The message payload is assumed to be a JSON object (not an array) and becomes the document..</li>
+ * <li>routing information if configured will be resolved via {@link AdaptrisMessage#resolve(String)}.</li>
+ * <li>parent-id information if configured will be resolved via {@link AdaptrisMessage#resolve(String)}.</li>
  * </ul>
  * </p>
  * 
@@ -34,6 +38,12 @@ import com.thoughtworks.xstream.annotations.XStreamAlias;
 @XStreamAlias("es5-json-document-builder")
 public class JsonDocumentBuilder extends JsonDocumentBuilderImpl {
 
+  @AdvancedConfig
+  @InputFieldHint(expression = true)
+  private String routing;
+  @AdvancedConfig
+  @InputFieldHint(expression = true)
+  private String parent;
 
   public JsonDocumentBuilder() {
     super();
@@ -55,12 +65,39 @@ public class JsonDocumentBuilder extends JsonDocumentBuilderImpl {
       }
       ObjectNode node = mapper.readTree(parser);
       XContentBuilder jsonContent = jsonBuilder(node);
-      result.add(new DocumentWrapper(msg.getUniqueId(), jsonContent, getTypeBuilder().getType(msg)));
+      result.add(new DocumentWrapper(msg.getUniqueId(), jsonContent, getTypeBuilder().getType(msg))
+          .withParent(msg.resolve(getParent())).withRouting(msg.resolve(getRouting())));
     }
     catch (Exception e) {
       throw ExceptionHelper.wrapProduceException(e);
     }
     return result;
+  }
+
+  public String getRouting() {
+    return routing;
+  }
+
+  /**
+   * Set the routing for this document.
+   * 
+   * @param routing the routing information (default is null)
+   */
+  public void setRouting(String routing) {
+    this.routing = routing;
+  }
+
+  public String getParent() {
+    return parent;
+  }
+
+  /**
+   * Set the parent id for this document
+   * 
+   * @param parent the parent id (default is null).
+   */
+  public void setParent(String parent) {
+    this.parent = parent;
   }
 
 }
