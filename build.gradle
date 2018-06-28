@@ -53,6 +53,13 @@ configurations {
   all*.exclude group: 'commons-logging'
   all*.exclude group: 'javamail'
   all*.exclude group: 'javax.mail', module: 'mail'
+  all*.exclude group: 'org.glassfish.hk2.external'
+  all*.exclude group: 'xalan', module: 'xalan'
+  all*.exclude group: 'net.sf.saxon', module: 'saxon'
+  all*.exclude group: 'org.codehaus.woodstox'
+  all*.exclude group: 'org.eclipse.jetty.orbit', module: 'javax.mail.glassfish'
+
+
 }
 
 configurations.all {
@@ -64,10 +71,15 @@ dependencies {
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
   compile ("com.adaptris:adp-simple-csv:$adpCoreVersion") { changing=true}
   compile ("org.elasticsearch:elasticsearch:5.2.2")
-  compile ("org.elasticsearch.plugin:transport-netty4-client:5.2.2")
-  compile ("io.netty:netty-all:4.1.7.Final")
+  compile ("org.elasticsearch.plugin:transport-netty4-client:5.2.2") {
+      exclude group: 'io.netty', module: 'netty-buffer'
+      exclude group: 'io.netty', module: 'netty-codec'
+      exclude group: 'io.netty', module: 'netty-codec-http'
+      exclude group: 'io.netty', module: 'netty-handler'
+  }
+  compile ("io.netty:netty-all:4.1.9.Final")
   compile ("com.jayway.jsonpath:json-path:2.2.0")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.8.10")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.8.11.1")
 
   testCompile ('junit:junit:4.11')
   testCompile ("com.adaptris:adp-stubs:$adpCoreVersion") { changing= true}
@@ -107,6 +119,8 @@ task generateVersion {
     ant.propertyfile(file: versionFile) {
       entry(key: 'component.name', value: componentName)
       entry(key: 'build.version', value: releaseVersion)
+      entry(key: 'groupId', value: "com.adaptris")
+      entry(key: 'artifactId', value: project.name)
       entry(key: 'build.date', value: new Date().format('yyyy-MM-dd'))
     }
   }
@@ -155,6 +169,8 @@ publishing {
         def properties = asNode().appendNode("properties")
         properties.appendNode("externalUrl", "https://www.elastic.co/products/elasticsearch")
         properties.appendNode("target", "3.5.0+")
+        properties.appendNode("tags", "elasticsearch")
+        properties.appendNode("license", "false")
       }
     }
   }
