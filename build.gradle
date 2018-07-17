@@ -138,7 +138,7 @@ javadoc {
 }
 
 jacoco {
-  toolVersion="0.7.9"
+  toolVersion="0.8.1"
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -184,3 +184,5 @@ publishing {
     }
   }
 }
+
+check.dependsOn jacocoTestReport
