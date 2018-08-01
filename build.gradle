@@ -79,7 +79,7 @@ dependencies {
       exclude group: 'io.netty', module: 'netty-handler'
   }
   compile ("io.netty:netty-all:4.1.9.Final")
-  compile ("com.jayway.jsonpath:json-path:2.2.0")
+  compile ("com.jayway.jsonpath:json-path:2.4.0")
   compile ("com.fasterxml.jackson.core:jackson-databind:2.9.6")
 
   testCompile ('junit:junit:4.11')
