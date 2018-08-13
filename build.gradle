@@ -1,12 +1,13 @@
 ext {
-  adpCoreVersion = project.hasProperty('adpCoreVersion') ? project.getProperty('adpCoreVersion') : '3.7-SNAPSHOT'
-  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.7-SNAPSHOT'
+  interlokCoreVersion = project.hasProperty('interlokCoreVersion') ? project.getProperty('interlokCoreVersion') : '3.8-SNAPSHOT'
+  releaseVersion = project.hasProperty('releaseVersion') ? project.getProperty('releaseVersion') : '3.8-SNAPSHOT'
   mavenPublishUrl = project.hasProperty('mavenPublishUrl') ? project.getProperty('mavenPublishUrl') : 'https://development.adaptris.net/nexus/content/repositories/snapshots'
   repoUsername = project.hasProperty('repoUsername') ? project.getProperty('repoUsername') : 'unknown'
   repoPassword = project.hasProperty('repoPassword') ? project.getProperty('repoPassword') : 'unknown'
   defaultNexusRepo = project.hasProperty('defaultNexusRepo') ? project.getProperty('defaultNexusRepo') : 'https://repo1.maven.org/maven2/'
-  interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : 'https://development.adaptris.net/javadocs/latest/Interlok-API/'
-  interlokCommonJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : 'https://development.adaptris.net/javadocs/latest/Interlok-Common/'
+  javadocsBaseUrl = "https://development.adaptris.net/nexus/content/sites/javadocs/com/adaptris"
+  interlokJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-core/" + interlokCoreVersion
+  interlokCommonJavadocs= project.hasProperty('interlokJavadocs') ? project.getProperty('interlokJavadocs') : javadocsBaseUrl + "/interlok-common/" + interlokCoreVersion
   componentName='Interlok/ElasticSearch (5+) Integration'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
@@ -67,9 +68,9 @@ configurations.all {
 }
 
 dependencies {
-  compile ("com.adaptris:adp-core:$adpCoreVersion") { changing= true}
+  compile ("com.adaptris:interlok-core:$interlokCoreVersion") { changing= true}
   compile ("org.slf4j:slf4j-api:$slf4jVersion")
-  compile ("com.adaptris:adp-simple-csv:$adpCoreVersion") { changing=true}
+  compile ("com.adaptris:interlok-csv:$interlokCoreVersion") { changing=true}
   compile ("org.elasticsearch:elasticsearch:5.2.2")
   compile ("org.elasticsearch.plugin:transport-netty4-client:5.2.2") {
       exclude group: 'io.netty', module: 'netty-buffer'
@@ -78,18 +79,19 @@ dependencies {
       exclude group: 'io.netty', module: 'netty-handler'
   }
   compile ("io.netty:netty-all:4.1.9.Final")
-  compile ("com.jayway.jsonpath:json-path:2.2.0")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.8.11.1")
+  compile ("com.jayway.jsonpath:json-path:2.4.0")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.9.6")
+  annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
 
-  testCompile ('junit:junit:4.11')
-  testCompile ("com.adaptris:adp-stubs:$adpCoreVersion") { changing= true}
+  testCompile ('junit:junit:4.12')
+  testCompile ("com.adaptris:interlok-stubs:$interlokCoreVersion") { changing= true}
   testCompile ("pl.allegro.tech:embedded-elasticsearch:2.1.0")
   testCompile ("org.apache.logging.log4j:log4j-core:2.8.1")
   testCompile ("org.apache.logging.log4j:log4j-1.2-api:2.8.1")
   testCompile ("org.apache.logging.log4j:log4j-slf4j-impl:2.8.1")
   testCompile ("org.apache.logging.log4j:log4j-api:2.8.1")
 
-  javadoc("com.adaptris:adp-core-apt:$adpCoreVersion") { changing= true}
+  javadoc("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
 
 }
 
@@ -138,7 +140,14 @@ javadoc {
 }
 
 jacoco {
-  toolVersion="0.7.9"
+  toolVersion="0.8.1"
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        html.enabled true
+    }
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
@@ -165,6 +174,7 @@ publishing {
       artifact examplesJar { classifier "examples" }
 
       pom.withXml {
+        asNode().appendNode("name", componentName)
         asNode().appendNode("description", "Connect and insert documents into ElasticSearch v5+ via version 5.x of their API")
         def properties = asNode().appendNode("properties")
         properties.appendNode("externalUrl", "https://www.elastic.co/products/elasticsearch")
@@ -184,3 +194,5 @@ publishing {
     }
   }
 }
+
+check.dependsOn jacocoTestReport
