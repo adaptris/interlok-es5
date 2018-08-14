@@ -28,12 +28,13 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.es5.types.ConfiguredTypeBuilder;
-import com.adaptris.core.services.splitter.CloseableIterable;
+import com.adaptris.core.util.CloseableIterable;
 import com.jayway.jsonpath.ReadContext;
 
 public class JsonDocumentBuilderTest extends BuilderCase {
 
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testBuild() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(sampleJsonContent());
@@ -59,7 +60,7 @@ public class JsonDocumentBuilderTest extends BuilderCase {
     JsonDocumentBuilder documentBuilder = new JsonDocumentBuilder(new ConfiguredTypeBuilder("store"));
     documentBuilder.setAddTimestampField("timestamp");
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         assertEquals(msg.getUniqueId(), doc.uniqueId());
@@ -78,7 +79,7 @@ public class JsonDocumentBuilderTest extends BuilderCase {
     JsonDocumentBuilder documentBuilder = new JsonDocumentBuilder(new ConfiguredTypeBuilder("store"));
     CloseableIterable<DocumentWrapper> docs = null;
     try {
-      docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg));
+      docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg));
       fail();
     } catch (ProduceException expected) {
 
@@ -94,7 +95,7 @@ public class JsonDocumentBuilderTest extends BuilderCase {
     JsonDocumentBuilder documentBuilder = new JsonDocumentBuilder(new ConfiguredTypeBuilder("store"));
     documentBuilder.setRouting("%message{routing}");
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         assertEquals(msg.getUniqueId(), doc.uniqueId());
@@ -116,7 +117,7 @@ public class JsonDocumentBuilderTest extends BuilderCase {
     JsonDocumentBuilder documentBuilder = new JsonDocumentBuilder(new ConfiguredTypeBuilder("store"));
     documentBuilder.setParent("%message{parent}");
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         assertEquals(msg.getUniqueId(), doc.uniqueId());

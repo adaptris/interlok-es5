@@ -30,7 +30,7 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceDestination;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.es5.actions.ActionExtractor;
-import com.adaptris.core.services.splitter.CloseableIterable;
+import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 
@@ -82,7 +82,7 @@ public class BulkOperation extends SingleOperation {
       final String index = destination.getDestination(msg);
       BulkRequestBuilder bulkRequest = transportClient.prepareBulk().setRefreshPolicy(getRefreshPolicy());
       long total = 0;
-      try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(getDocumentBuilder().build(msg))) {
+      try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(getDocumentBuilder().build(msg))) {
         int count = 0;
         for (DocumentWrapper doc : docs) {
           count++;

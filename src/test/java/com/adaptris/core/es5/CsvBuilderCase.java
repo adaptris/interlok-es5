@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.services.splitter.CloseableIterable;
+import com.adaptris.core.util.CloseableIterable;
 import com.jayway.jsonpath.ReadContext;
 
 public abstract class CsvBuilderCase extends BuilderCase {
@@ -46,7 +46,7 @@ public abstract class CsvBuilderCase extends BuilderCase {
     msg.addMetadata(testName.getMethodName(), testName.getMethodName());
     CSVDocumentBuilderImpl documentBuilder = createBuilder();
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         ReadContext context = parse(doc.content().string());

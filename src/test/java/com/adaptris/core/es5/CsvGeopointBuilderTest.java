@@ -28,11 +28,8 @@ import org.junit.Test;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.es5.CSVWithGeoPointBuilder;
-import com.adaptris.core.es5.DocumentWrapper;
-import com.adaptris.core.es5.ElasticSearchProducer;
 import com.adaptris.core.es5.fields.ToUpperCaseFieldNameMapper;
-import com.adaptris.core.services.splitter.CloseableIterable;
+import com.adaptris.core.util.CloseableIterable;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 
@@ -76,7 +73,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder();
     documentBuilder.setAddTimestampField("My_Timestamp");
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         ReadContext context = parse(doc.content().string());
@@ -97,7 +94,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLONG);
     CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder();
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         ReadContext context = parse(doc.content().string());
@@ -118,7 +115,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder();
     documentBuilder.setFieldNameMapper(new ToUpperCaseFieldNameMapper());
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         ReadContext context = parse(doc.content().string());
@@ -142,7 +139,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     documentBuilder.setLongitudeFieldNames("My_Lon");
     documentBuilder.setLocationFieldName("My_Location");
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         ReadContext context = parse(doc.content().string());
@@ -162,7 +159,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITH_LATLONG_AND_DELTA);
     CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder();
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         ReadContext context = parse(doc.content().string());
@@ -182,7 +179,7 @@ public class CsvGeopointBuilderTest extends CsvBuilderCase {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage(CSV_WITHOUT_LATLONG);
     CSVWithGeoPointBuilder documentBuilder = new CSVWithGeoPointBuilder();
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ElasticSearchProducer.ensureCloseable(documentBuilder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(documentBuilder.build(msg))) {
       for (DocumentWrapper doc : docs) {
         count++;
         ReadContext context = parse(doc.content().string());

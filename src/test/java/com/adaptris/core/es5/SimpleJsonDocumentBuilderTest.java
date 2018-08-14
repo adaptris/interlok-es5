@@ -25,15 +25,13 @@ import org.junit.Test;
 
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
-import com.adaptris.core.es5.DocumentWrapper;
-import com.adaptris.core.es5.ElasticSearchProducer;
-import com.adaptris.core.es5.SimpleDocumentBuilder;
-import com.adaptris.core.services.splitter.CloseableIterable;
+import com.adaptris.core.util.CloseableIterable;
 import com.jayway.jsonpath.ReadContext;
 
 public class SimpleJsonDocumentBuilderTest extends BuilderCase {
 
 
+  @SuppressWarnings("deprecation")
   @Test
   public void testBuild() throws Exception {
     AdaptrisMessage msg = AdaptrisMessageFactory.getDefaultInstance().newMessage("Hello World");

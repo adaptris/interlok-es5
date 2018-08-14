@@ -16,7 +16,6 @@
 
 package com.adaptris.core.es5;
 
-import static com.adaptris.core.es5.ElasticSearchProducer.ensureCloseable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -27,7 +26,7 @@ import org.junit.Test;
 import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.AdaptrisMessageFactory;
 import com.adaptris.core.es5.types.ConfiguredTypeBuilder;
-import com.adaptris.core.services.splitter.CloseableIterable;
+import com.adaptris.core.util.CloseableIterable;
 import com.jayway.jsonpath.PathNotFoundException;
 import com.jayway.jsonpath.ReadContext;
 
@@ -42,7 +41,7 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     AdaptrisMessage msg = createMessage();
     JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder(new ConfiguredTypeBuilder("cropzones"));
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(builder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
       for (DocumentWrapper d : docs) {
         count++;
         assertNotNull(d.uniqueId());
@@ -64,7 +63,7 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     builder.setAddTimestampField("timestamp");
     builder.setBufferSize(4096);
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(builder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
       for (DocumentWrapper d : docs) {
         count++;
         assertNotNull(d.uniqueId());
@@ -85,7 +84,7 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder(new ConfiguredTypeBuilder("cropzones"));
     builder.setUniqueIdJsonPath("$.originorgid");
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(builder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
       for (DocumentWrapper d : docs) {
         count++;
         assertNotNull(d.uniqueId());
@@ -101,7 +100,7 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     AdaptrisMessage msg = createMessage();
     JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder(new ConfiguredTypeBuilder("cropzones"));
     builder.setUniqueIdJsonPath("$.umwhat");
-    try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(builder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
       for (DocumentWrapper d : docs) {
         // iterating over the first doc should cause a RuntimeException
         fail();
@@ -118,7 +117,7 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder(new ConfiguredTypeBuilder("cropzones"));
     builder.setRoutingJsonPath("$.originorgid");
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(builder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
       for (DocumentWrapper d : docs) {
         count++;
         assertNotNull(d.uniqueId());
@@ -140,7 +139,7 @@ public class JsonArrayDocumentBuilderTest extends BuilderCase {
     JsonArrayDocumentBuilder builder = new JsonArrayDocumentBuilder(new ConfiguredTypeBuilder("cropzones"));
     builder.setParentJsonPath("$.sourceorgid");
     int count = 0;
-    try (CloseableIterable<DocumentWrapper> docs = ensureCloseable(builder.build(msg))) {
+    try (CloseableIterable<DocumentWrapper> docs = CloseableIterable.ensureCloseable(builder.build(msg))) {
       for (DocumentWrapper d : docs) {
         count++;
         assertNotNull(d.uniqueId());
