@@ -16,13 +16,11 @@
 
 package com.adaptris.core.es5;
 
-import java.io.IOException;
-import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
 import com.adaptris.core.CoreException;
 import com.adaptris.core.RequestReplyProducerImp;
-import com.adaptris.core.services.splitter.CloseableIterable;
+import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.util.TimeInterval;
 
 /**
@@ -67,21 +65,11 @@ public abstract class ElasticSearchProducer extends RequestReplyProducerImp {
     return TIMEOUT.toMilliseconds();
   }
 
+  /**
+   * @deprecated since 3.8.1, just use {@link CloseableIterable#ensureCloseable(Iterable)} instead.
+   */
+  @Deprecated
   protected static <E> CloseableIterable<E> ensureCloseable(final Iterable<E> iter) {
-    if (iter instanceof CloseableIterable) {
-      return (CloseableIterable<E>) iter;
-    }
-
-    return new CloseableIterable<E>() {
-      @Override
-      public void close() throws IOException {
-        // No-op
-      }
-
-      @Override
-      public Iterator<E> iterator() {
-        return iter.iterator();
-      }
-    };
+    return CloseableIterable.ensureCloseable(iter);
   }
 }

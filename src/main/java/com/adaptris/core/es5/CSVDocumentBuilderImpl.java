@@ -41,10 +41,10 @@ import com.adaptris.core.AdaptrisMessage;
 import com.adaptris.core.ProduceException;
 import com.adaptris.core.es5.fields.FieldNameMapper;
 import com.adaptris.core.es5.fields.NoOpFieldNameMapper;
-import com.adaptris.core.services.splitter.CloseableIterable;
 import com.adaptris.core.transform.csv.BasicFormatBuilder;
 import com.adaptris.core.transform.csv.FormatBuilder;
 import com.adaptris.core.util.Args;
+import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 
 public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
