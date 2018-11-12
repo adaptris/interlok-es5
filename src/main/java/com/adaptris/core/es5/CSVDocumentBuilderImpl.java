@@ -136,6 +136,7 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
   protected abstract class CSVDocumentWrapper implements CloseableIterable<DocumentWrapper>, Iterator {
     protected CSVParser parser;
     protected Iterator<CSVRecord> csvIterator;
+    private boolean iteratorInvoked = false;
 
     public CSVDocumentWrapper(CSVParser p) {
       parser = p;
@@ -144,6 +145,10 @@ public abstract class CSVDocumentBuilderImpl implements ElasticDocumentBuilder {
 
     @Override
     public Iterator<DocumentWrapper> iterator() {
+      if (iteratorInvoked) {
+        throw new IllegalStateException("iterator already invoked");
+      }
+      iteratorInvoked = true;
       return this;
     }
 

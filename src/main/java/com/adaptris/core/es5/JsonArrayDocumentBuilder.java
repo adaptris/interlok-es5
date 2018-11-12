@@ -38,6 +38,7 @@ import com.adaptris.core.es5.types.TypeBuilder;
 import com.adaptris.core.util.CloseableIterable;
 import com.adaptris.core.util.ExceptionHelper;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonParser.Feature;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -94,10 +95,11 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
   @Override
   public Iterable<DocumentWrapper> build(AdaptrisMessage msg) throws ProduceException {
     try {
-      BufferedReader buf = new BufferedReader(msg.getReader(), bufferSize());
       String type = getTypeBuilder().getType(msg);
       ObjectMapper mapper = new ObjectMapper();
-      JsonParser parser = mapper.getFactory().createParser(buf);
+      // The buffered read will be closed during the iterator close.
+      BufferedReader buf = new BufferedReader(msg.getReader(), bufferSize()); // lgtm
+      JsonParser parser = mapper.getFactory().createParser(buf).configure(Feature.AUTO_CLOSE_SOURCE, true);
       if (parser.nextToken() != JsonToken.START_ARRAY) {
         throw new ProduceException("Expected an array");
       }
@@ -201,6 +203,7 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
     private DocumentWrapper nextMessage;
     private transient Configuration jsonConfig = new Configuration.ConfigurationBuilder().jsonProvider(new JsonSmartJsonProvider())
         .mappingProvider(new JacksonMappingProvider()).options(EnumSet.noneOf(Option.class)).build();
+    private boolean iteratorInvoked = false;
 
     public JsonDocumentWrapper(ObjectMapper mapper, JsonParser parser, String type) {
       this.mapper = mapper;
@@ -249,6 +252,10 @@ public class JsonArrayDocumentBuilder extends JsonDocumentBuilderImpl {
 
     @Override
     public Iterator<DocumentWrapper> iterator() {
+      if (iteratorInvoked) {
+        throw new IllegalStateException("iterator already invoked");
+      }
+      iteratorInvoked = true;
       return this;
     }
 
