@@ -178,8 +178,7 @@ public class ElasticSearchConnection extends NoOpConnection {
     }
     else {
       String s = hostUrl.substring(hostUrl.lastIndexOf(":") + 1);
-      s.replaceAll("/", "");
-      result = Integer.parseInt(s);
+      result = Integer.parseInt(s.replaceAll("/", ""));
     }
     return result;
   }
