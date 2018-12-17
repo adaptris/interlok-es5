@@ -77,7 +77,7 @@ dependencies {
   compile ("org.elasticsearch:elasticsearch:5.2.2")
   compile ("org.elasticsearch.plugin:transport-netty4-client:5.2.2")
   compile ("com.jayway.jsonpath:json-path:2.4.0")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.9.7")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.9.8")
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
 
   testCompile ('junit:junit:4.12')
