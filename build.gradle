@@ -14,7 +14,7 @@ ext {
   componentName='Interlok/ElasticSearch (5+) Integration'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.25'
+  slf4jVersion = '1.7.26'
   log4j2Version = '2.9.1'
 }
 
