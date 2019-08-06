@@ -188,6 +188,7 @@ publishing {
         properties.appendNode("target", "3.5.0+")
         properties.appendNode("tags", "elasticsearch")
         properties.appendNode("license", "false")
+        properties.appendNode("deprecated", "Consider migrating to interlok-elastic-rest; the underlying transport was deprecated in Elastic 7.x")
       }
     }
   }
