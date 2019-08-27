@@ -23,8 +23,8 @@ ext {
   componentName='Interlok/ElasticSearch (5+) Integration'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.26'
-  log4j2Version = '2.11.2'
+  slf4jVersion = '1.7.27'
+  log4j2Version = '2.12.1'
 }
 
 if (JavaVersion.current().isJava8Compatible()) {
@@ -74,7 +74,7 @@ dependencies {
   compile ("org.elasticsearch:elasticsearch:5.2.2")
   compile ("org.elasticsearch.plugin:transport-netty4-client:5.2.2")
   compile ("com.jayway.jsonpath:json-path:2.4.0")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.9.9")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.9.9.3")
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
 
   testCompile ('junit:junit:4.12')
@@ -188,6 +188,7 @@ publishing {
         properties.appendNode("target", "3.5.0+")
         properties.appendNode("tags", "elasticsearch")
         properties.appendNode("license", "false")
+        properties.appendNode("deprecated", "Consider migrating to interlok-elastic-rest; the underlying transport was deprecated in Elastic 7.x")
       }
     }
   }
