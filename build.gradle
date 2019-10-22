@@ -23,7 +23,7 @@ ext {
   componentName='Interlok/ElasticSearch (5+) Integration'
   organizationName = "Adaptris Ltd"
   organizationUrl = "http://interlok.adaptris.net"
-  slf4jVersion = '1.7.27'
+  slf4jVersion = '1.7.28'
   log4j2Version = '2.12.1'
 }
 
@@ -74,7 +74,7 @@ dependencies {
   compile ("org.elasticsearch:elasticsearch:5.2.2")
   compile ("org.elasticsearch.plugin:transport-netty4-client:5.2.2")
   compile ("com.jayway.jsonpath:json-path:2.4.0")
-  compile ("com.fasterxml.jackson.core:jackson-databind:2.9.9.3")
+  compile ("com.fasterxml.jackson.core:jackson-databind:2.10.0")
   annotationProcessor ("com.adaptris:interlok-core-apt:$interlokCoreVersion") { changing= true}
 
   testCompile ('junit:junit:4.12')
