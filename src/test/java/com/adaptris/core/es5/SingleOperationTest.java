@@ -16,6 +16,7 @@
 
 package com.adaptris.core.es5;
 
+import org.junit.Test;
 import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.ProducerCase;
 import com.adaptris.core.StandaloneProducer;
@@ -27,10 +28,12 @@ public class SingleOperationTest extends ProducerCase {
 
   private static final String EXAMPLE_COMMENT_HEADER = "\n<!--" + "\n-->\n";
 
-  public SingleOperationTest(String name) {
-    super(name);
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
-
+  
+  @Test
   public void testNoOp() throws Exception {
 
   }

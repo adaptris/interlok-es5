@@ -16,6 +16,9 @@
 
 package com.adaptris.core.es5;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import org.junit.Test;
 import com.adaptris.core.ConfiguredProduceDestination;
 import com.adaptris.core.ProducerCase;
 import com.adaptris.core.StandaloneProducer;
@@ -27,10 +30,12 @@ public class BulkOperationTest extends ProducerCase {
 
   private static final String EXAMPLE_COMMENT_HEADER = "\n<!--" + "\n-->\n";
 
-  public BulkOperationTest(String name) {
-    super(name);
+  @Override
+  public boolean isAnnotatedForJunit4() {
+    return true;
   }
 
+  @Test
   public void testRefreshPolicy() throws Exception {
     BulkOperation producer = new BulkOperation();
     assertNull(producer.getRefreshPolicy());
