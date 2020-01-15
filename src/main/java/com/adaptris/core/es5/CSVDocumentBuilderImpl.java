@@ -16,7 +16,7 @@
 
 package com.adaptris.core.es5;
 
-import static org.apache.commons.lang.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 
 import java.io.IOException;
 import java.util.ArrayList;
