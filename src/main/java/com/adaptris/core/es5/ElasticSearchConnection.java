@@ -20,21 +20,20 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import javax.mail.URLName;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.lease.Releasable;
 import org.elasticsearch.common.settings.Settings;
-
 import com.adaptris.annotation.AdapterComponent;
 import com.adaptris.annotation.AdvancedConfig;
 import com.adaptris.annotation.AutoPopulated;
 import com.adaptris.annotation.ComponentProfile;
 import com.adaptris.annotation.DisplayOrder;
+import com.adaptris.annotation.InputFieldDefault;
 import com.adaptris.core.CoreException;
 import com.adaptris.core.NoOpConnection;
 import com.adaptris.core.util.Args;
@@ -77,6 +76,12 @@ public class ElasticSearchConnection extends NoOpConnection {
   @AdvancedConfig
   private TransportClientFactory transportClientFactory;
 
+  @AdvancedConfig
+  @InputFieldDefault(value = "true")
+  private Boolean sharedTransportClient;
+
+  private transient TransportClient transportClient = null;
+
   public ElasticSearchConnection() {
     setTransportUrls(new ArrayList<String>());
     setSettings(new KeyValuePairSet());
@@ -88,14 +93,36 @@ public class ElasticSearchConnection extends NoOpConnection {
     setTransportUrls(new ArrayList<String>(Arrays.asList(transportUrls)));
   }
 
-  protected TransportClient createClient() throws CoreException {
+  @Override
+  @SuppressWarnings("deprecation")
+  protected void closeConnection() {
+    super.closeConnection();
+    IOUtils.closeQuietly(transportClient);
+    transportClient = null;
+  }
+
+  @Override
+  protected void initConnection() throws CoreException {
+  }
+
+  protected synchronized TransportClient createClient() throws CoreException {
+    if (sharedTransportClient()) {
+      if (transportClient == null) {
+        transportClient = doCreate();
+      }
+      return transportClient;
+    }
+    return doCreate();
+  }
+
+  private TransportClient doCreate() throws CoreException {
     // Settings s = Settings.settingsBuilder().put(asMap(getSettings())).build();
     // TransportClient transportClient = TransportClient.builder().settings(s).build();
-    TransportClient transportClient = transportClientFactory().create(createSettings());
+    TransportClient tc = transportClientFactory().create(createSettings());
     for (String url : getTransportUrls()) {
-      transportClient.addTransportAddress(TransportAddressFactory.create(new InetSocketAddress(getHost(url), getPort(url))));
+      tc.addTransportAddress(TransportAddressFactory.create(new InetSocketAddress(getHost(url), getPort(url))));
     }
-    return transportClient;
+    return tc;
   }
 
   public KeyValuePairSet getSettings() {
@@ -136,18 +163,12 @@ public class ElasticSearchConnection extends NoOpConnection {
     return getTransportClientFactory() != null ? getTransportClientFactory() : DEFAULT_CLIENT_FACTORY;
   }
 
+  @SuppressWarnings("deprecation")
   protected void closeQuietly(TransportClient c) {
-    doClose((Releasable) c);
-  }
-
-  private static void doClose(Releasable c) {
-    try {
-      if (c != null) {
-        c.close();
-      }
-    }
-    catch (Exception e) {
-      ;
+    // Make this a dummy method to avoid creating a new TC per producer.
+    // doClose(c);
+    if (!sharedTransportClient()) {
+      IOUtils.closeQuietly(c);
     }
   }
 
@@ -183,4 +204,20 @@ public class ElasticSearchConnection extends NoOpConnection {
     return result;
   }
 
+  public Boolean getSharedTransportClient() {
+    return sharedTransportClient;
+  }
+
+  /**
+   * Whether or not to share the same transport client across multiple producers.
+   * 
+   * @param b true or false, default is true if not specified.
+   */
+  public void setSharedTransportClient(Boolean b) {
+    this.sharedTransportClient = b;
+  }
+
+  private boolean sharedTransportClient() {
+    return BooleanUtils.toBooleanDefaultIfNull(getSharedTransportClient(), true);
+  }
 }
