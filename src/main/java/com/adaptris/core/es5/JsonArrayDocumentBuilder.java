@@ -16,7 +16,7 @@
 
 package com.adaptris.core.es5;
 
-import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
